@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
-public final class FXTools {
+public final class ChatRoomFXTools {
 	public static Background getBackgroundFromColor(final Color color) {
 		return new Background(new BackgroundFill(color, null, null));
 	}
@@ -196,6 +196,6 @@ public final class FXTools {
 		return label;
 	}
 
-	private FXTools() {
+	private ChatRoomFXTools() {
 	}
 }
