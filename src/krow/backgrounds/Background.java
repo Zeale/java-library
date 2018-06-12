@@ -11,30 +11,26 @@ import javafx.scene.paint.Color;
 /**
  * <h1 align="center">{@link Background}</h1>
  * <h3 align="center">The superclass for all other {@link Background}s...</h3>
- * 
+ *
  * <br>
  * <p>
  * The {@link Background} class provides many different methods to allow
  * external manipulation such as mouse interaction, fading in and out, and a few
  * other things. As of now, subclasses may choose wheter or not to implement
  * these methods.
- * 
+ *
  * @author Zeale
  *
  */
 public abstract class Background {
+	private static final Color DEFAULT_COLOR = Color.BLACK;
+
+	private static final double DEFAULT_ANIMATION_DURATION = 8;
+
 	public static final Background createEmptyBackground() {
 		return new Background() {
 			@Override
-			public void show(Pane pane) {
-			}
-
-			@Override
-			public void fadeOut() {
-			}
-
-			@Override
-			public void fadeIn() {
+			public void disable() {
 			}
 
 			@Override
@@ -42,24 +38,17 @@ public abstract class Background {
 			}
 
 			@Override
-			public void disable() {
+			public void fadeIn() {
+			}
+
+			@Override
+			public void fadeOut() {
+			}
+
+			@Override
+			public void show(final Pane pane) {
 			}
 		};
-	}
-
-	private static final Color DEFAULT_COLOR = Color.BLACK;
-	private static final double DEFAULT_ANIMATION_DURATION = 8;
-
-	public abstract void show(Pane pane);
-
-	public void dispose() {
-		disable();
-		for (Node n : mouseDetectionNodes)
-			n.setOnMouseMoved(null);
-		mouseDetectionNodes.clear();
-		if (hasUnderlyingPane())
-			currentPane.setOnMouseMoved(null);
-		currentPane = null;
 	}
 
 	private double animationDuration = DEFAULT_ANIMATION_DURATION;
@@ -106,6 +95,16 @@ public abstract class Background {
 		currentPane.setOnMouseMoved(null);
 	}
 
+	public void dispose() {
+		disable();
+		for (final Node n : mouseDetectionNodes)
+			n.setOnMouseMoved(null);
+		mouseDetectionNodes.clear();
+		if (hasUnderlyingPane())
+			currentPane.setOnMouseMoved(null);
+		currentPane = null;
+	}
+
 	public abstract void enable();
 
 	public void enableMouseInteraction() {
@@ -136,6 +135,10 @@ public abstract class Background {
 
 	public Color getStartColor() {
 		return startColor;
+	}
+
+	protected boolean hasUnderlyingPane() {
+		return currentPane != null;
 	}
 
 	public void removeMouseDetectionNodes(final Node... nodes) {
@@ -172,8 +175,6 @@ public abstract class Background {
 			currentPane.setOnMouseMoved(mouseMovementHandler);
 	}
 
-	protected boolean hasUnderlyingPane() {
-		return currentPane != null;
-	}
+	public abstract void show(Pane pane);
 
 }

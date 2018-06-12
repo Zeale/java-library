@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 public interface StyledPrintable extends ColoredPrintable {
 
 	@Override
-	default void print(String text, Color color) {
+	default void print(final String text, final Color color) {
 		print(text, color, false, false);
 	}
 

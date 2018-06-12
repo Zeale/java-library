@@ -31,49 +31,27 @@ public abstract class LoadBox extends Dialogue<AnchorPane> {
 	private Task<Boolean> loader;
 	private Runnable onDoneLoading;
 
-	private DoubleProperty size = new SimpleDoubleProperty(512);
+	private final DoubleProperty size = new SimpleDoubleProperty(512);
 	{
 		size.addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> resize(newValue.doubleValue()));
-	}
-
-	public void setOnDoneLoading(Runnable onDoneLoading) {
-		this.onDoneLoading = onDoneLoading;
 	}
 
 	private final EventHandler<WorkerStateEvent> loadHandler = event -> {
 		if (event.getSource().isRunning() || event.getEventType().equals(WorkerStateEvent.WORKER_STATE_SCHEDULED))
 			return;
 		// When done loading, we can show the continueButton ourselves.
-		int pos = flowBox.getChildren().indexOf(loadingBar);
+		final int pos = flowBox.getChildren().indexOf(loadingBar);
 		flowBox.getChildren().set(pos, continueButton);
 	};
-
-	public void setLoader(Task<Boolean> loader) {
-		if (this.loader != null)
-			this.loader.removeEventHandler(WorkerStateEvent.ANY, loadHandler);
-		this.loader = loader;
-		loadingBar.progressProperty().bind(loader.progressProperty());
-		loader.addEventHandler(WorkerStateEvent.ANY, loadHandler);
-	}
-
-	public void load() {
-		loader.run();
-	}
-
-	public boolean getLoadResult() throws InterruptedException, ExecutionException {
-		return loader.get();
-	}
 
 	{
 		build();
 	}
 
-	public LoadBox(Stage loadStage) {
+	public LoadBox(final Stage loadStage) {
 		super(new AnchorPane(), loadStage);
 		pane.getChildren().addAll(flowBox);
 	}
-
-	protected abstract Image getNextImage();
 
 	@Override
 	protected void build() {
@@ -95,7 +73,7 @@ public abstract class LoadBox extends Dialogue<AnchorPane> {
 
 		continueButton.setOnAction(event -> onDoneLoading.run());
 
-		Image img = new Image("/krow/resources/Testing.png");
+		final Image img = new Image("/krow/resources/Testing.png");
 		loadingBar.setCursor(new ImageCursor(img, img.getWidth() / 2, img.getHeight() / 2));
 
 		continueButton.setStyle(
@@ -103,7 +81,21 @@ public abstract class LoadBox extends Dialogue<AnchorPane> {
 
 	}
 
-	protected void resize(double newSize) {
+	public ProgressBar getLoadingBar() {
+		return loadingBar;
+	}
+
+	public boolean getLoadResult() throws InterruptedException, ExecutionException {
+		return loader.get();
+	}
+
+	protected abstract Image getNextImage();
+
+	public void load() {
+		loader.run();
+	}
+
+	protected void resize(final double newSize) {
 
 		// Add a bit to the height for the Button at the bottom.
 		pane.setPrefHeight(newSize + 45d / 512 * newSize);// 30, scaled from 512 to newSize
@@ -129,20 +121,28 @@ public abstract class LoadBox extends Dialogue<AnchorPane> {
 
 	}
 
+	public void setLoader(final Task<Boolean> loader) {
+		if (this.loader != null)
+			this.loader.removeEventHandler(WorkerStateEvent.ANY, loadHandler);
+		this.loader = loader;
+		loadingBar.progressProperty().bind(loader.progressProperty());
+		loader.addEventHandler(WorkerStateEvent.ANY, loadHandler);
+	}
+
+	public void setOnDoneLoading(final Runnable onDoneLoading) {
+		this.onDoneLoading = onDoneLoading;
+	}
+
+	public void setProgress(final double progress) {
+		loadingBar.setProgress(progress);
+	}
+
 	@Override
 	public void show() {
 		stage.show();
 		stage.sizeToScene();
 		stage.centerOnScreen();
 		loader.run();
-	}
-
-	public void setProgress(double progress) {
-		loadingBar.setProgress(progress);
-	}
-
-	public ProgressBar getLoadingBar() {
-		return loadingBar;
 	}
 
 }

@@ -22,10 +22,9 @@ public final class ShapeFactory {
 	 * Please note that the SVG code was copied straight from GitHub's website.
 	 *
 	 * @param scaleFactor
-	 *            The scale factor of this {@link SVGPath}. This is applied to
-	 *            both the {@link Shape#scaleXProperty()} and the
-	 *            {@link Shape#scaleYProperty()} of the resulting
-	 *            {@link SVGPath}.
+	 *            The scale factor of this {@link SVGPath}. This is applied to both
+	 *            the {@link Shape#scaleXProperty()} and the
+	 *            {@link Shape#scaleYProperty()} of the resulting {@link SVGPath}.
 	 * @return A {@link SVGPath} representing an Octicon.
 	 */
 	public static SVGPath buildOcticon(final double scaleFactor) {

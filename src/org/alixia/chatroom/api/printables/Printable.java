@@ -7,7 +7,7 @@ public interface Printable {
 		print("\n");
 	}
 
-	default void println(String line) {
+	default void println(final String line) {
 		print(line);
 		println();
 	}

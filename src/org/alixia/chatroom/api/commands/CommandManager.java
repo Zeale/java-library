@@ -42,27 +42,27 @@ public class CommandManager {
 
 	public final boolean runCommand(final String rawInput) {
 
-		String input = rawInput.trim();
+		final String input = rawInput.trim();
 
 		class Parser {
 			int position;
 			private final String text;
 
+			public Parser(final String text) {
+				this.text = text;
+			}
+
 			int getNextChar() {
 				return position >= text.length() ? -1 : text.charAt(position++);
 			}
 
-			public Parser(String text) {
-				this.text = text;
-			}
-
 		}
 
-		Parser parser = new Parser(input);
+		final Parser parser = new Parser(input);
 
 		// This might be replaceable with a quick call to
 		// "startsWith(getCommandChar())"...
-		int commandCharLength = getCommandChar().length();
+		final int commandCharLength = getCommandChar().length();
 		while (parser.position < commandCharLength)
 			if (parser.getNextChar() != getCommandChar().charAt(parser.position - 1))
 				return false;
@@ -91,16 +91,16 @@ public class CommandManager {
 				else
 					command += '\\';
 				backslashed = false;
-			} else if (c == '\\') {
+			} else if (c == '\\')
 				backslashed = true;
-			} else if (quoted) {
+			else if (quoted) {
 				if (c == '"')
 					quoted = false;
 				else
 					command += (char) c;
-			} else if (c == '"') {
+			} else if (c == '"')
 				quoted = true;
-			} else if (Character.isWhitespace(c))
+			else if (Character.isWhitespace(c))
 				break;
 			else
 				command += (char) c;
@@ -113,7 +113,7 @@ public class CommandManager {
 		// "/test something"
 		// We are at the "s" in "something"
 
-		List<String> args = new ArrayList<>();
+		final List<String> args = new ArrayList<>();
 		String arg = "";
 
 		backslashed = false;
@@ -142,16 +142,16 @@ public class CommandManager {
 				else
 					arg += "\\";
 				backslashed = false;
-			} else if (c == '\\') {
+			} else if (c == '\\')
 				backslashed = true;
-			} else if (quoted) {
+			else if (quoted) {
 				if (c == '"')
 					quoted = false;
 				else
 					arg += (char) c;
-			} else if (c == '"') {
+			} else if (c == '"')
 				quoted = true;
-			} else if (Character.isWhitespace(c)) {
+			else if (Character.isWhitespace(c)) {
 				while (Character.isWhitespace(c = parser.getNextChar()))
 					;
 

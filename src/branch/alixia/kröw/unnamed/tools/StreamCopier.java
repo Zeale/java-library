@@ -12,7 +12,34 @@ public class StreamCopier {
 	private final OutputStream output;
 	private final double inputSize;
 
-	public StreamCopier(double inputSize, WritableValue<Number> progress, InputStream input, OutputStream output) {
+	private Throwable exception;
+
+	private boolean started;
+
+	private final Thread thread = new Thread(new Runnable() {
+		@Override
+		public void run() {
+
+			try {
+
+				final int bufferLength = 1024;
+				long totalReadData = 0;
+
+				final byte[] buffer = new byte[bufferLength];
+				int amount;
+				while ((amount = input.read(buffer)) != -1) {
+					totalReadData += amount;
+					output.write(buffer, 0, amount);
+					progress.setValue(totalReadData / inputSize);
+				}
+			} catch (final Throwable e) {
+				exception = e;
+			}
+		}
+	});
+
+	public StreamCopier(final double inputSize, final WritableValue<Number> progress, final InputStream input,
+			final OutputStream output) {
 		this.progress = progress;
 		this.input = input;
 		this.output = output;
@@ -22,36 +49,9 @@ public class StreamCopier {
 
 	}
 
-	private Throwable exception;
-
 	public Throwable getException() {
 		return exception;
 	}
-
-	private boolean started;
-
-	private final Thread thread = new Thread(new Runnable() {
-
-		@Override
-		public void run() {
-
-			try {
-
-				int bufferLength = 1024;
-				long totalReadData = 0;
-
-				byte[] buffer = new byte[bufferLength];
-				int amount;
-				while ((amount = input.read(buffer)) != -1) {
-					totalReadData += amount;
-					output.write(buffer, 0, amount);
-					progress.setValue(totalReadData / inputSize);
-				}
-			} catch (Throwable e) {
-				exception = e;
-			}
-		}
-	});
 
 	public void start() {
 		if (!started) {

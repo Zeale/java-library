@@ -8,14 +8,15 @@ public final class Logger {
 
 	public static final Logger CHAT_ROOM_LOGGER = new Logger("CHAT-ROOM");
 
+	private static StyledPrintable defaultPrinter;
+
+	public static void setPrinter(final StyledPrintable printer) {
+	}
+
 	public Color bracketColor = Color.ORANGERED, parentColor = Color.MEDIUMVIOLETRED, childColor = Color.RED,
 			separatorColor = Color.WHITE, messageColor = Color.WHITE;
+
 	public boolean boldHeader = false;
-	
-	public static void setPrinter(StyledPrintable printer) {
-	}
-	
-	private static StyledPrintable defaultPrinter;
 
 	protected final StyledPrintable printer = defaultPrinter;
 
@@ -23,7 +24,6 @@ public final class Logger {
 	private final String name;
 
 	public String separator = ".";
-
 
 	public Logger(final String name) {
 		this.name = name;
@@ -68,30 +68,24 @@ public final class Logger {
 	}
 
 	public void log(final String message) {
-		//printIdentifier();
+		// printIdentifier();
 		printer.println(message, messageColor);
 	}
 
 	/*
-	public void logBold(final String message) {
-		printIdentifier();
-		boldPrinter.print(message + "\n", messageColor);
-	}
-
-	private void printIdentifier() {
-		boldPrinter.print("[", bracketColor);
-		final String[] names = getFullName().split("\\.");
-		for (int i = 0; i < names.length - 1; i++) {
-			final String s = names[i];
-			(boldHeader ? boldPrinter : printer).print(s,
-					parentColor.interpolate(childColor, (double) i / (names.length - 1)));
-			(boldHeader ? boldPrinter : printer).print(separator, separatorColor);
-		}
-		(boldHeader ? boldPrinter : printer).print(getName(), childColor);
-		boldPrinter.print("]: ", bracketColor);
-
-	}
-	*/
+	 * public void logBold(final String message) { printIdentifier();
+	 * boldPrinter.print(message + "\n", messageColor); }
+	 * 
+	 * private void printIdentifier() { boldPrinter.print("[", bracketColor); final
+	 * String[] names = getFullName().split("\\."); for (int i = 0; i < names.length
+	 * - 1; i++) { final String s = names[i]; (boldHeader ? boldPrinter :
+	 * printer).print(s, parentColor.interpolate(childColor, (double) i /
+	 * (names.length - 1))); (boldHeader ? boldPrinter : printer).print(separator,
+	 * separatorColor); } (boldHeader ? boldPrinter : printer).print(getName(),
+	 * childColor); boldPrinter.print("]: ", bracketColor);
+	 * 
+	 * }
+	 */
 
 	public void setSeparator(final String separator) {
 		this.separator = separator;

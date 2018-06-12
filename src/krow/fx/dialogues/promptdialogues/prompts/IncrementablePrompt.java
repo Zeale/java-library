@@ -16,34 +16,22 @@ public abstract class IncrementablePrompt<K, V> extends PromptDialogue<? super K
 		});
 	}
 
-	public IncrementablePrompt(PromptDialogue<? super K, ? super V> owner, K key, String description) {
+	public IncrementablePrompt(final PromptDialogue<? super K, ? super V> owner, final K key,
+			final String description) {
 		owner.super(key, description);
 	}
 
-	public IncrementablePrompt(PromptDialogue<? super K, ? super V> owner, K key, String description, V defaultValue) {
+	public IncrementablePrompt(final PromptDialogue<? super K, ? super V> owner, final K key, final String description,
+			final V defaultValue) {
 		owner.super(key, description, defaultValue);
 	}
-
-	/**
-	 * Called when the user scrolls up by one unit. This is not the same value as
-	 * that retrieved from a {@link ScrollEvent#getDeltaY()} call, since that is
-	 * measured in pixels. This is measured in how many "notches" that the user
-	 * turned the mouse wheel.
-	 * 
-	 * @param amount
-	 *            The amount of times the user scrolled the mouse wheel. This method
-	 *            will be called as a result of a scroll event and will be passed
-	 *            the value, <code>{@link ScrollEvent#getDeltaY()} / 40</code> for
-	 *            this <b><code>amount</code></b> parameter.
-	 */
-	protected abstract void increment(double amount);
 
 	/**
 	 * Called when the user scrolls down by one unit. This is not the same value as
 	 * that retrieved from a {@link ScrollEvent#getDeltaY()} call, since that is
 	 * measured in pixels. This is measured in how many "notches" that the user
 	 * turned the mouse wheel.
-	 * 
+	 *
 	 * @param amount
 	 *            <p>
 	 *            The amount of times the user scrolled the mouse wheel. This method
@@ -57,5 +45,19 @@ public abstract class IncrementablePrompt<K, V> extends PromptDialogue<? super K
 	 *            <b><code>amount</code></b> is assured to be positive.
 	 */
 	protected abstract void decrement(double amount);
+
+	/**
+	 * Called when the user scrolls up by one unit. This is not the same value as
+	 * that retrieved from a {@link ScrollEvent#getDeltaY()} call, since that is
+	 * measured in pixels. This is measured in how many "notches" that the user
+	 * turned the mouse wheel.
+	 *
+	 * @param amount
+	 *            The amount of times the user scrolled the mouse wheel. This method
+	 *            will be called as a result of a scroll event and will be passed
+	 *            the value, <code>{@link ScrollEvent#getDeltaY()} / 40</code> for
+	 *            this <b><code>amount</code></b> parameter.
+	 */
+	protected abstract void increment(double amount);
 
 }

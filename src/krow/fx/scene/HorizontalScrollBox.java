@@ -24,22 +24,6 @@ public class HorizontalScrollBox extends HBox {
 	public static int DEFAULT_NODE_WIDTH = 100, DEFAULT_NODE_HEIGHT = 100,
 			DEFAULT_NODE_SPACING = (int) ((double) DEFAULT_NODE_WIDTH / 2);
 
-	{
-		setSpacing(DEFAULT_NODE_SPACING);
-	}
-
-	private IntegerProperty nodeWidth = new SimpleIntegerProperty(DEFAULT_NODE_WIDTH),
-			nodeHeight = new SimpleIntegerProperty(DEFAULT_NODE_HEIGHT);
-
-	private double jumpDistance = getNodeWidth() + getSpacing();
-
-	{
-		nodeWidthProperty().addListener((ChangeListener<Number>) (observable, oldValue,
-				newValue) -> jumpDistance = newValue.doubleValue() + getSpacing());
-		spacingProperty().addListener((ChangeListener<Number>) (observable, oldValue,
-				newValue) -> jumpDistance = newValue.doubleValue() + getNodeWidth());
-	}
-
 	/**
 	 * Convenience method for obtaining a Node's slider.
 	 *
@@ -49,6 +33,22 @@ public class HorizontalScrollBox extends HBox {
 	 */
 	private static TranslateTransition getSlider(final Node node) {
 		return (TranslateTransition) node.getProperties().get(PropertyKeys.SLIDER);
+	}
+
+	{
+		setSpacing(DEFAULT_NODE_SPACING);
+	}
+
+	private final IntegerProperty nodeWidth = new SimpleIntegerProperty(DEFAULT_NODE_WIDTH),
+			nodeHeight = new SimpleIntegerProperty(DEFAULT_NODE_HEIGHT);
+
+	private double jumpDistance = getNodeWidth() + getSpacing();
+
+	{
+		nodeWidthProperty().addListener((ChangeListener<Number>) (observable, oldValue,
+				newValue) -> jumpDistance = newValue.doubleValue() + getSpacing());
+		spacingProperty().addListener((ChangeListener<Number>) (observable, oldValue,
+				newValue) -> jumpDistance = newValue.doubleValue() + getNodeWidth());
 	}
 
 	private double forceWidth = -1, forceHeight = -1;
@@ -134,6 +134,22 @@ public class HorizontalScrollBox extends HBox {
 		return forceWidth;
 	}
 
+	public final int getNodeHeight() {
+		return nodeHeightProperty().get();
+	}
+
+	public final int getNodeWidth() {
+		return nodeWidthProperty().get();
+	}
+
+	public final IntegerProperty nodeHeightProperty() {
+		return nodeHeight;
+	}
+
+	public final IntegerProperty nodeWidthProperty() {
+		return nodeWidth;
+	}
+
 	public void selectCenter() {
 		setDisplacement(jumpDistance * (getChildren().size() / 2));
 	}
@@ -168,36 +184,20 @@ public class HorizontalScrollBox extends HBox {
 			super.setHeight(value);
 	}
 
+	public final void setNodeHeight(final int nodeHeight) {
+		nodeHeightProperty().set(nodeHeight);
+	}
+
+	public final void setNodeWidth(final int nodeWidth) {
+		nodeWidthProperty().set(nodeWidth);
+	}
+
 	@Override
 	protected void setWidth(final double value) {
 		if (forceWidth >= 0)
 			super.setWidth(forceWidth);
 		else
 			super.setWidth(value);
-	}
-
-	public final IntegerProperty nodeWidthProperty() {
-		return this.nodeWidth;
-	}
-
-	public final int getNodeWidth() {
-		return this.nodeWidthProperty().get();
-	}
-
-	public final void setNodeWidth(final int nodeWidth) {
-		this.nodeWidthProperty().set(nodeWidth);
-	}
-
-	public final IntegerProperty nodeHeightProperty() {
-		return this.nodeHeight;
-	}
-
-	public final int getNodeHeight() {
-		return this.nodeHeightProperty().get();
-	}
-
-	public final void setNodeHeight(final int nodeHeight) {
-		this.nodeHeightProperty().set(nodeHeight);
 	}
 
 }

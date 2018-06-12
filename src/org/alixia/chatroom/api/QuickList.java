@@ -10,14 +10,14 @@ public class QuickList<E> extends LinkedList<E> {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@SafeVarargs
-	public QuickList(E... es) {
-		for (E e : es)
-			add(e);
+	public QuickList(final Collection<? extends E> c) {
+		super(c);
 	}
 
-	public QuickList(Collection<? extends E> c) {
-		super(c);
+	@SafeVarargs
+	public QuickList(final E... es) {
+		for (final E e : es)
+			add(e);
 	}
 
 }

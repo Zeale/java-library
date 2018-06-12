@@ -40,7 +40,7 @@ import zeale.libs.fxtools.fixes.ScrollPaneBackgroundFixer;
  * The prompt is shown in a <code>showAndWait</code> manner, meaning that the
  * call to show the {@link PromptDialogue} will block until the user exits the
  * dialogue.
- * 
+ *
  * @author Zeale
  *
  * @param <K>
@@ -61,16 +61,16 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 		// This will become abstract, to follow the change described right above the
 		// class declaration. Next commit :D
 
-		public BasicPrompt(K key, String description) {
+		public BasicPrompt(final K key, final String description) {
 			super(key, description);
 		}
 
-		public BasicPrompt(K key, String description, String hint) {
+		public BasicPrompt(final K key, final String description, final String hint) {
 			this(key, description);
 			setHint(hint);
 		}
 
-		public BasicPrompt(K key, String description, String hint, String defaultValue) {
+		public BasicPrompt(final K key, final String description, final String hint, final String defaultValue) {
 			this(key, description);
 			setHint(hint);
 		}
@@ -80,12 +80,12 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 			return field.getText();
 		}
 
-		public void setHint(String text) {
+		public void setHint(final String text) {
 			field.setPromptText(text);
 		}
 
 		@Override
-		public void setValue(String value) {
+		public void setValue(final String value) {
 			field.setText(value);
 		}
 
@@ -100,7 +100,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 	 * A superclass for Prompts used by this {@link PromptDialogue}. When a
 	 * {@link Prompt} is created, it automatically adds itself to its parent
 	 * {@link PromptDialogue} [defined in this class].
-	 * 
+	 *
 	 * @author Zeale
 	 *
 	 * @param <PV>
@@ -123,7 +123,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 
 		private K key;
 
-		private Text fieldDescription = new Text();
+		private final Text fieldDescription = new Text();
 
 		private boolean required;
 
@@ -139,18 +139,18 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 			setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
 		}
 
-		public Prompt(K key, String description) {
+		public Prompt(final K key, final String description) {
 			if (!setKey(key))
 				throw new RuntimeException("Invalid key.");
 			setDescription(description);
 		}
 
-		public Prompt(K key, String description, PV defaultValue) {
+		public Prompt(final K key, final String description, final PV defaultValue) {
 			this(key, description);
 			setValue(defaultValue);
 		}
 
-		protected final void addContent(Node content) {
+		protected final void addContent(final Node content) {
 			getChildren().add(content);
 		}
 
@@ -160,7 +160,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 
 		protected abstract PV getValue();
 
-		private void highlightDescription(Color color) {
+		private void highlightDescription(final Color color) {
 			fieldDescription.setFill(color);
 			fieldDescription.setFont(Font.font(13.2));
 		}
@@ -176,7 +176,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 			removePrompt(this);
 		}
 
-		protected final void removeContent(Node content) {
+		protected final void removeContent(final Node content) {
 			getChildren().remove(content);
 		}
 
@@ -185,25 +185,25 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 			fieldDescription.setFont(Font.getDefault());
 		}
 
-		public final void setDescription(String text) {
+		public final void setDescription(final String text) {
 			fieldDescription.setText(text);
 		}
 
 		/**
 		 * Attempts to set this prompt's key.
-		 * 
+		 *
 		 * @param key
 		 *            The new key.
 		 * @return <code>true</code> if this succeeded, <code>false</code> otherwise.
 		 */
-		public final boolean setKey(K key) {
+		public final boolean setKey(final K key) {
 			if (keyTaken(key))
 				return false;
 			this.key = key;
 			return true;
 		}
 
-		public final void setRequired(boolean required) {
+		public final void setRequired(final boolean required) {
 			this.required = required;
 		}
 
@@ -219,7 +219,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 		 * If this method returns false when it is called by the PromptDialogue, then
 		 * the dialogue will remain hidden and this Prompt's description will become
 		 * red.
-		 * 
+		 *
 		 * @return <code>true</code> if the value is acceptable, <code>false</code>
 		 *         otherwise.
 		 */
@@ -228,45 +228,45 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 
 	public abstract class TextFieldPrompt<PV extends V> extends Prompt<PV> {
 
-		public TextFieldPrompt(K key, String description, PV defaultValue) {
-			super(key, description, defaultValue);
-		}
-
 		protected final TextField field = new TextField();
 
 		{
 			addContent(field);
 		}
 
-		public TextFieldPrompt(K key, String description) {
+		public TextFieldPrompt(final K key, final String description) {
 			super(key, description);
 		}
 
-		protected void setText(String text) {
-			field.setText(text);
+		public TextFieldPrompt(final K key, final String description, final PV defaultValue) {
+			super(key, description, defaultValue);
 		}
 
 		protected String getText() {
 			return field.getText();
 		}
 
+		protected void setText(final String text) {
+			field.setText(text);
+		}
+
 	}
 
 	// Will contain the scrollPort and the doneButton.
-	private VBox fullContent = new VBox(20);
+	private final VBox fullContent = new VBox(20);
 
 	// Will contain each individual prompt.
-	private VBox promptWrapper = new VBox(15);
+	private final VBox promptWrapper = new VBox(15);
 
 	// Will contain the promptWrapper, allowing the user to scroll down if there are
 	// an exceedingly large amount of prompts. :)
-	private ScrollPane scrollPort = new ScrollPane(promptWrapper);
+	private final ScrollPane scrollPort = new ScrollPane(promptWrapper);
 
 	// The button that the user will push when they are ready to submit all the
 	// values.
-	private Button doneButton = new Button("Continue");
+	private final Button doneButton = new Button("Continue");
 
-	private ObservableList<Prompt<? extends V>> basicPrompts = FXCollections.observableArrayList();
+	private final ObservableList<Prompt<? extends V>> basicPrompts = FXCollections.observableArrayList();
 
 	{
 
@@ -277,10 +277,10 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 		getDialogPane().setContent(fullContent);
 
 		doneButton.setOnAction(event -> {
-			Map<K, V> values = new HashMap<>();
+			final Map<K, V> values = new HashMap<>();
 
 			boolean requiredPromptsFilled = true;
-			for (Prompt<? extends V> p : basicPrompts) {
+			for (final Prompt<? extends V> p : basicPrompts)
 				// If this prompt's input isn't acceptable
 				if (!p.verifyValue()) {
 					// AND if the prompt is required
@@ -290,18 +290,13 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 						// Make sure that we don't close the prompt dialogue and give the calling
 						// program a value.
 						requiredPromptsFilled = false;
-					}
-
-					// The input is wrong, but this prompt isn't necessary.
-					else {
+					} else
 						// So we notify the user but with orange, not red.
 						p.highlightDescription(Color.DARKORANGE);
-						// The orange coloring will only show if there are any necessary prompts that
-						// aren't filled as well, since this code will close the prompt window if all
-						// necessary prompts are filled. The user won't be able to see the color once
-						// the prompt closes.
-
-					}
+					// The orange coloring will only show if there are any necessary prompts that
+					// aren't filled as well, since this code will close the prompt window if all
+					// necessary prompts are filled. The user won't be able to see the color once
+					// the prompt closes.
 				}
 
 				// This prompt's value is acceptable.
@@ -312,8 +307,6 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 						// Then we can continue to build the map that we will return.
 						values.put(p.getKey(), p.getValue());
 				}
-
-			}
 
 			// If they haven't filled out required prompts then don't close the prompt;
 			// we're not done here.
@@ -346,90 +339,90 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 
 	}
 
-	public void setFill(Color color) {
-		getDialogPane().setBackground(FXTools.getBackgroundFromColor(color));
-	}
-
-	private Collection<K> keys = new LinkedList<>();
+	private final Collection<K> keys = new LinkedList<>();
 
 	public PromptDialogue() {
 	}
 
-	public PromptDialogue(String title) {
+	public PromptDialogue(final String title) {
 		setTitle(title);
 	}
 
-	private void addPrompt(Prompt<? extends V> prompt) {
+	private void addPrompt(final Prompt<? extends V> prompt) {
 		if (basicPrompts.contains(prompt))
 			return;
 		basicPrompts.add(prompt);
 		promptWrapper.getChildren().add(prompt);
 	}
 
-	private boolean keyTaken(K key) {
-		return keys.contains(key);
-	}
-
-	private void removePrompt(Prompt<? extends V> p) {
-		while (basicPrompts.contains(p))
-			basicPrompts.remove(p);
-		while (promptWrapper.getChildren().contains(p))
-			promptWrapper.getChildren().remove(p);
-	}
-
-	public final void setMinWidth(double value) {
-		fullContent.setMinWidth(value);
-	}
-
-	public final double getMinWidth() {
-		return fullContent.getMinWidth();
-	}
-
-	public final DoubleProperty minWidthProperty() {
-		return fullContent.minWidthProperty();
-	}
-
-	public final void setMinHeight(double value) {
-		fullContent.setMinHeight(value);
-	}
-
-	public final double getMinHeight() {
-		return fullContent.getMinHeight();
-	}
-
-	public final DoubleProperty minHeightProperty() {
-		return fullContent.minHeightProperty();
-	}
-
-	public void setMinSize(double minWidth, double minHeight) {
-		fullContent.setMinSize(minWidth, minHeight);
-	}
-
-	public final void setMaxWidth(double value) {
-		fullContent.setMaxWidth(value);
+	public final double getMaxHeight() {
+		return fullContent.getMaxHeight();
 	}
 
 	public final double getMaxWidth() {
 		return fullContent.getMaxWidth();
 	}
 
-	public final DoubleProperty maxWidthProperty() {
-		return fullContent.maxWidthProperty();
+	public final double getMinHeight() {
+		return fullContent.getMinHeight();
 	}
 
-	public final void setMaxHeight(double value) {
-		fullContent.setMaxHeight(value);
+	public final double getMinWidth() {
+		return fullContent.getMinWidth();
 	}
 
-	public final double getMaxHeight() {
-		return fullContent.getMaxHeight();
+	private boolean keyTaken(final K key) {
+		return keys.contains(key);
 	}
 
 	public final DoubleProperty maxHeightProperty() {
 		return fullContent.maxHeightProperty();
 	}
 
-	public void setMaxSize(double maxWidth, double maxHeight) {
+	public final DoubleProperty maxWidthProperty() {
+		return fullContent.maxWidthProperty();
+	}
+
+	public final DoubleProperty minHeightProperty() {
+		return fullContent.minHeightProperty();
+	}
+
+	public final DoubleProperty minWidthProperty() {
+		return fullContent.minWidthProperty();
+	}
+
+	private void removePrompt(final Prompt<? extends V> p) {
+		while (basicPrompts.contains(p))
+			basicPrompts.remove(p);
+		while (promptWrapper.getChildren().contains(p))
+			promptWrapper.getChildren().remove(p);
+	}
+
+	public void setFill(final Color color) {
+		getDialogPane().setBackground(FXTools.getBackgroundFromColor(color));
+	}
+
+	public final void setMaxHeight(final double value) {
+		fullContent.setMaxHeight(value);
+	}
+
+	public void setMaxSize(final double maxWidth, final double maxHeight) {
 		fullContent.setMaxSize(maxWidth, maxHeight);
+	}
+
+	public final void setMaxWidth(final double value) {
+		fullContent.setMaxWidth(value);
+	}
+
+	public final void setMinHeight(final double value) {
+		fullContent.setMinHeight(value);
+	}
+
+	public void setMinSize(final double minWidth, final double minHeight) {
+		fullContent.setMinSize(minWidth, minHeight);
+	}
+
+	public final void setMinWidth(final double value) {
+		fullContent.setMinWidth(value);
 	}
 }

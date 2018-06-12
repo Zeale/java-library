@@ -10,12 +10,12 @@ public class Window<T extends Parent> extends Stage {
 	protected final Scene scene;
 	protected final T root;
 
-	public Window(T root) {
+	public Window(final T root) {
 		scene = new Scene(root);
 		this.root = root;
 	}
 
-	public Window(T root, StageStyle style) {
+	public Window(final T root, final StageStyle style) {
 		this(root);
 		initStyle(style);
 	}

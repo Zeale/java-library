@@ -19,6 +19,55 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 public final class ChatRoomFXTools {
+	public static Label addHoverText(final Node node, final String text, final Color backgroundColor,
+			final Window stage) {
+		final Label label = addHoverText(node, text, stage);
+		label.getScene().setFill(backgroundColor);
+		return label;
+	}
+
+	public static Label addHoverText(final Node node, final String text, final Window stage) {
+
+		final Label label = new Label(text);
+
+		new Object() {
+			private final Popup popup = new Popup();
+
+			{
+				popup.getScene().setRoot(label);
+
+				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+					popup.setX(event.getScreenX());
+					popup.setY(event.getScreenY() - 50);
+					popup.show(stage);
+					popup.sizeToScene();
+				});
+				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
+			}
+		};
+
+		return label;
+
+	}
+
+	public static void addPopup(final Node node, final Parent popupRoot, final Window stage) {
+		new Object() {
+			private final Popup popup = new Popup();
+
+			{
+				popup.getScene().setRoot(popupRoot);
+
+				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+					popup.setX(event.getScreenX());
+					popup.setY(event.getScreenY() - 50);
+					popup.show(stage);
+					popup.sizeToScene();
+				});
+				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
+			}
+		};
+	}
+
 	public static Background getBackgroundFromColor(final Color color) {
 		return new Background(new BackgroundFill(color, null, null));
 	}
@@ -146,54 +195,6 @@ public final class ChatRoomFXTools {
 	public static void spawnLabelAtMousePos(final String text, final Color color, final Stage stage) {
 		spawnLabel(text, color, MouseInfo.getPointerInfo().getLocation().getX(),
 				MouseInfo.getPointerInfo().getLocation().getY(), stage);
-	}
-
-	public static void addPopup(Node node, Parent popupRoot, Window stage) {
-		new Object() {
-			private final Popup popup = new Popup();
-
-			{
-				popup.getScene().setRoot(popupRoot);
-
-				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-					popup.setX(event.getScreenX());
-					popup.setY(event.getScreenY() - 50);
-					popup.show(stage);
-					popup.sizeToScene();
-				});
-				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
-			}
-		};
-	}
-
-	public static Label addHoverText(Node node, String text, Window stage) {
-
-		final Label label = new Label(text);
-
-		new Object() {
-			private final Popup popup = new Popup();
-
-			{
-				popup.getScene().setRoot(label);
-
-				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-					popup.setX(event.getScreenX());
-					popup.setY(event.getScreenY() - 50);
-					popup.show(stage);
-					popup.sizeToScene();
-				});
-				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
-			}
-		};
-
-		return label;
-
-	}
-
-	public static Label addHoverText(Node node, String text, Color backgroundColor, Window stage) {
-		Label label = addHoverText(node, text, stage);
-		label.getScene().setFill(backgroundColor);
-		return label;
 	}
 
 	private ChatRoomFXTools() {

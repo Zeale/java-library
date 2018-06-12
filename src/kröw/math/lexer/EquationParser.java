@@ -19,26 +19,26 @@ import kröw.math.lexer.exceptions.UnmatchedWrapperException;
  * A whitespace character signifies that a parse method (either
  * {@link #parseTerm()} or {@link #parseBinaryOperator()}) should stop parsing
  * because it has reached the next element of the equation. For example:
- * 
+ *
  * <pre>
  * <code>1 + 72 +    316</code>
  * </pre>
- * 
+ *
  * <p>
  * Although the above mathematical sequence is awkwardly spaced, it is
  * syntactically valid. The spaces force an element to end. So if there was a
  * space between the <code>3</code> and <code>16</code> in the above sequence,
  * like so:
- * 
+ *
  * <pre>
  * <code>1 + 72 +    3 16</code>
  * </pre>
- * 
+ *
  * <p>
  * then this {@link EquationParser} is expected to find the following elements:
  * <br>
  * <br>
- * 
+ *
  * <table cellpadding="1" cellspacing="0" border="1">
  * <tr>
  * <th>Parsed Token</th>
@@ -73,30 +73,96 @@ import kröw.math.lexer.exceptions.UnmatchedWrapperException;
  * <p>
  * This {@link EquationParser} should not parse two numbers separated solely by
  * whitespace.
- * 
+ *
  * @author Zeale
  *
  */
 public class EquationParser {
 
 	public static final EquationParser getDebuggingParser() {
-		EquationParser parser = new EquationParser();
+		final EquationParser parser = new EquationParser();
 		parser.debug = true;
 		return parser;
-	}
-
-	private EquationParser(EquationParser parent) {
-		if (parent.debug)
-			debug = true;
-		this.debugTabbing = parent.debugTabbing + 1;
 	}
 
 	private final int debugTabbing;
 
 	private String equation;
-	private int position;
 
+	private int position;
 	private boolean isEvaluating, debug;
+
+	public EquationParser() {
+		debugTabbing = 0;
+	}
+
+	private EquationParser(final EquationParser parent) {
+		if (parent.debug)
+			debug = true;
+		debugTabbing = parent.debugTabbing + 1;
+	}
+
+	private boolean canIncPos() {
+		return position + 1 < equation.length();
+	}
+
+	private void errdeb(String text) {
+		if (debug) {
+			for (int i = 0; i < debugTabbing; i++)
+				text = '\t' + text;
+			System.err.println(text);
+		}
+	}
+
+	public double evaluate(String equation) {
+		stddeb("STARTING EVALUATION OF EQUATION: " + equation);
+		stddeb();
+		stddeb();
+
+		if (isEvaluating)
+			throw new LexerInUseException();
+		isEvaluating = true;
+		position = 0;
+
+		stddeb("Trimming equation before parsing...");
+		stddeb();
+		equation = equation.trim();
+
+		this.equation = equation;
+
+		// We start out expecting some kind of numerical value/term, not an
+		// operator.
+		final Equation equ = new Equation();
+
+		int round = 0;
+
+		while (true) {
+			round++;
+			stddeb("Parsing Term " + round);
+			final Term term = parseTerm();
+			stddeb("Term parsed as " + term.value + ". Operator parsed as " + term.getOperator().operator + "\n\n");
+			equ.add(term);
+			if (term.getOperator() == Operator.END_LINE)
+				break;
+		}
+
+		// TODO Add a testing parser that sysouts stuff like this:
+		// for (Term t : equ)
+		// System.out.println(t.value + " " + t.getOperator().operator);
+
+		isEvaluating = false;
+
+		// TODO Return value
+		final double result = equ.evaluate();
+		stddeb("RESULT = " + result);
+		if (!(debugTabbing > 0)) {
+			stddeb();
+			stddeb();
+		}
+		stddeb();
+		return result;
+
+	}
 
 	private char getCurrentChar() {
 		return equation.charAt(position);
@@ -115,6 +181,10 @@ public class EquationParser {
 												// is safe.
 	}
 
+	private boolean outOfBounds() {
+		return !(position < equation.length());
+	}
+
 	/**
 	 * <p>
 	 * This is a <strong>parse method</strong>.
@@ -127,7 +197,72 @@ public class EquationParser {
 	 * <p>
 	 * This method will return with {@link #position} being the start of the next
 	 * element.
-	 * 
+	 *
+	 * @return The next operator in the sequence.
+	 */
+	private Operator parseOperator() {
+		stddeb("Parsing the next operator. Starting at pos=" + position
+				+ (outOfBounds() ? "" : ",char=" + getCurrentChar()));
+
+		if (outOfBounds())
+			return Operator.END_LINE;
+
+		// Erase any whitespace malarkey. :P
+		while (MathChars.isWhitespace(getCurrentChar()))
+			if (!incrementPosition())
+				return Operator.END_LINE;
+
+		// First, handle a lack of operator.
+		if (!MathChars.possibleOperator("" + getCurrentChar()))
+			// We're in this block because the character after the last term is not a
+			// possible operator. It must be part of the NEXT term, in which case the terms
+			// are being multiplied. e.g., 1(2)
+			//
+			// 1 is the first term, (2) is the second term. They are being multiplied.
+			return Operator.MULTIPLY;
+
+		if (!canIncPos())
+			throw new MisplacedOperatorException();
+
+		String operator = "" + getCurrentChar();
+		// If "what we've read so far" + "the next character" is a possible
+		// operator...
+		while (MathChars.possibleOperator(operator + getNextChar())) {
+			// ...then add it to our operator's name.
+			incrementPosition();
+			operator += getCurrentChar();
+			// We're in this while loop because we've hit an operator. If there is no next
+			// character...
+			if (!canIncPos())
+				// ...then throw an error. (You can't evaluate "1 + 3 - " because you don't know
+				// what to subtract at the end.)
+				throw new MisplacedOperatorException();
+		}
+
+		stddeb("\tFinished operator parsing loop. Left with \'" + operator
+				+ (operator.isEmpty() ? "{NO_OPERATOR}\'\n\t\tMultiplication implicitly assumed." : "\'"));
+		if (!operator.isEmpty())// If "operator" is empty, then there was no operator between the two terms, and
+								// we need not skip to the next char, as the current one is part of the next
+								// term.
+			incrementPosition();
+		// TODO if(MathChars.isOperator(getCurrentChar()))throw new
+		// InvalidOperatorException();
+		return MathChars.getOperator(operator);
+	}
+
+	/**
+	 * <p>
+	 * This is a <strong>parse method</strong>.
+	 * <p>
+	 * <strong>This method expects to be called at the position it should start
+	 * at.</strong> i.e., {@link #getCurrentChar()} should return the character that
+	 * this method will begin to work with. If the first character that this method
+	 * encounters is whitespace, a warning will be thrown and the whitespace will be
+	 * skipped with {@link #getNextChar()}.
+	 * <p>
+	 * This method will return with {@link #position} being the start of the next
+	 * element.
+	 *
 	 * @return The next term in the sequence.
 	 */
 	private Term parseTerm() {
@@ -155,9 +290,8 @@ public class EquationParser {
 					throw new DuplicateDecimalException();
 				numb += getCurrentChar();
 				stddeb("\tCOLLECTED CHAR \"" + getCurrentChar() + "\". So far, number is \"" + numb + "\"");
-				if (!incrementPosition()) {
+				if (!incrementPosition())
 					break;
-				}
 			} while (MathChars.isNumber(getCurrentChar()));
 			if (numb.startsWith("."))
 				numb = "0" + numb;
@@ -168,7 +302,7 @@ public class EquationParser {
 			return new Term(neg ? -Double.parseDouble(numb) : Double.parseDouble(numb),
 					outOfBounds() ? Operator.END_LINE : parseOperator());
 		} else if (MathChars.isOpenWrapper(getCurrentChar())) {
-			char nestingChar = getCurrentChar();
+			final char nestingChar = getCurrentChar();
 			stddeb("\tFound a wrapper; " + nestingChar + ". Starting term collection...");
 			String term = "";// Don't concat these outer parentheses.
 			int nesting = 1;
@@ -187,9 +321,8 @@ public class EquationParser {
 					stddeb("\t\tFound equal close wrapper. Decrementing nesting to " + nesting);
 					if (nesting == 0) {
 						stddeb("\t\tNesting has reached 0. Finishing parsing of wrapped section...");
-						if (!incrementPosition()) {
+						if (!incrementPosition())
 							endLine = true;
-						}
 						break;
 					}
 				}
@@ -204,9 +337,9 @@ public class EquationParser {
 
 			return new Term(new EquationParser(this).evaluate(term), endLine ? Operator.END_LINE : parseOperator());
 
-		} else if (MathChars.isCloseWrapper(getCurrentChar())) {
+		} else if (MathChars.isCloseWrapper(getCurrentChar()))
 			throw new IllegalCharException();
-		} else if (MathChars.validFunctionChar(getCurrentChar())) {
+		else if (MathChars.validFunctionChar(getCurrentChar())) {
 			String func = "" + getCurrentChar();
 			// Get the function's name.
 			while (canIncPos() && MathChars.validFunctionChar(getNextChar())) {
@@ -242,9 +375,8 @@ public class EquationParser {
 						stddeb("\t\tFound equal close wrapper. Decrementing nesting to " + nesting);
 						if (nesting == 0) {
 							stddeb("\t\tNesting has reached 0. Finishing parsing of wrapped section...");
-							if (!incrementPosition()) {
+							if (!incrementPosition())
 								endLine = true;
-							}
 							break;
 						}
 					}
@@ -258,9 +390,8 @@ public class EquationParser {
 				return new Term(MathChars.getFunction(func).calculate(new EquationParser(this).evaluate(param)),
 						endLine ? Operator.END_LINE : parseOperator());
 
-			} else {// We may have a constant. For now, let's just throw an error.
+			} else
 				throw new IllegalCharException("The function name was not followed by parentheses.");
-			}
 
 			// Parse the following string of characters for a function. We know
 			// our term has ended when a character that can not be used in a
@@ -271,128 +402,9 @@ public class EquationParser {
 		return null;
 	}
 
-	public EquationParser() {
-		debugTabbing = 0;
-	}
-
-	/**
-	 * <p>
-	 * This is a <strong>parse method</strong>.
-	 * <p>
-	 * <strong>This method expects to be called at the position it should start
-	 * at.</strong> i.e., {@link #getCurrentChar()} should return the character that
-	 * this method will begin to work with. If the first character that this method
-	 * encounters is whitespace, a warning will be thrown and the whitespace will be
-	 * skipped with {@link #getNextChar()}.
-	 * <p>
-	 * This method will return with {@link #position} being the start of the next
-	 * element.
-	 * 
-	 * @return The next operator in the sequence.
-	 */
-	private Operator parseOperator() {
-		stddeb("Parsing the next operator. Starting at pos=" + position
-				+ (outOfBounds() ? "" : ",char=" + getCurrentChar()));
-
-		if (outOfBounds())
-			return Operator.END_LINE;
-
-		// Erase any whitespace malarkey. :P
-		while (MathChars.isWhitespace(getCurrentChar()))
-			if (!incrementPosition())
-				return Operator.END_LINE;
-
-		// First, handle a lack of operator.
-		if (!MathChars.possibleOperator("" + getCurrentChar())) {
-			// We're in this block because the character after the last term is not a
-			// possible operator. It must be part of the NEXT term, in which case the terms
-			// are being multiplied. e.g., 1(2)
-			//
-			// 1 is the first term, (2) is the second term. They are being multiplied.
-			return Operator.MULTIPLY;
-		}
-
-		if (!canIncPos())
-			throw new MisplacedOperatorException();
-
-		String operator = "" + getCurrentChar();
-		// If "what we've read so far" + "the next character" is a possible
-		// operator...
-		while (MathChars.possibleOperator(operator + getNextChar())) {
-			// ...then add it to our operator's name.
-			incrementPosition();
-			operator += getCurrentChar();
-			// We're in this while loop because we've hit an operator. If there is no next
-			// character...
-			if (!canIncPos())
-				// ...then throw an error. (You can't evaluate "1 + 3 - " because you don't know
-				// what to subtract at the end.)
-				throw new MisplacedOperatorException();
-		}
-
-		stddeb("\tFinished operator parsing loop. Left with \'" + operator
-				+ (operator.isEmpty() ? "{NO_OPERATOR}\'\n\t\tMultiplication implicitly assumed." : "\'"));
-		if (!operator.isEmpty())// If "operator" is empty, then there was no operator between the two terms, and
-								// we need not skip to the next char, as the current one is part of the next
-								// term.
-			incrementPosition();
-		// TODO if(MathChars.isOperator(getCurrentChar()))throw new
-		// InvalidOperatorException();
-		return MathChars.getOperator(operator);
-	}
-
-	public double evaluate(String equation) {
-		stddeb("STARTING EVALUATION OF EQUATION: " + equation);
-		stddeb();
-		stddeb();
-
-		if (isEvaluating)
-			throw new LexerInUseException();
-		isEvaluating = true;
-		position = 0;
-
-		stddeb("Trimming equation before parsing...");
-		stddeb();
-		equation = equation.trim();
-
-		this.equation = equation;
-
-		// We start out expecting some kind of numerical value/term, not an
-		// operator.
-		Equation equ = new Equation();
-
-		int round = 0;
-
-		while (true) {
-			round++;
-			stddeb("Parsing Term " + round);
-			Term term = parseTerm();
-			stddeb("Term parsed as " + term.value + ". Operator parsed as " + term.getOperator().operator + "\n\n");
-			equ.add(term);
-			if (term.getOperator() == Operator.END_LINE)
-				break;
-		}
-
-		// TODO Add a testing parser that sysouts stuff like this:
-		// for (Term t : equ)
-		// System.out.println(t.value + " " + t.getOperator().operator);
-
-		isEvaluating = false;
-
-		// TODO Return value
-		double result = equ.evaluate();
-		stddeb("RESULT = " + result);
-		if (!(debugTabbing > 0)) {
-			stddeb();
-			stddeb();
-		}
-		stddeb();
-		return result;
-
-	}
-
-	private boolean outOfBounds() {
-		return !(position < equation.length());
+	private void stddeb() {
+		if (debug)
+			System.out.println();
 	}
 
 	private void stddeb(String text) {
@@ -401,27 +413,5 @@ public class EquationParser {
 				text = '\t' + text;
 			System.out.println(text);
 		}
-	}
-
-	private void stddeb() {
-		if (debug)
-			System.out.println();
-	}
-
-	private void errdeb(String text) {
-		if (debug) {
-			for (int i = 0; i < debugTabbing; i++)
-				text = '\t' + text;
-			System.err.println(text);
-		}
-	}
-
-	private void errdeb() {
-		if (debug)
-			System.err.println();
-	}
-
-	private boolean canIncPos() {
-		return position + 1 < equation.length();
 	}
 }

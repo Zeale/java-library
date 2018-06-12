@@ -24,11 +24,76 @@ public final class FXTools {
 	public static final Color SECONDARY_WINDOW_BORDER_COLOR = ITEM_BORDER_COLOR.interpolate(DEFAULT_WINDOW_COLOR, 0.5);
 	public static final double COMMON_BORDER_WIDTH = 2;
 
-	private FXTools() {
+	public static Label addHoverText(final Node node, final String text, final Color backgroundColor,
+			final Window stage) {
+		return ChatRoomFXTools.addHoverText(node, text, backgroundColor, stage);
+	}
+
+	public static Label addHoverText(final Node node, final String text, final Window stage) {
+		return ChatRoomFXTools.addHoverText(node, text, stage);
+	}
+
+	public static void addPopup(final Node node, final Parent popupRoot, final Window stage) {
+		ChatRoomFXTools.addPopup(node, popupRoot, stage);
+	}
+
+	public static Transition applyHoverColorAnimation(final Shape shape) {
+		return UnnamedFXTools.applyHoverColorAnimation(shape);
+	}
+
+	public static Transition applyHoverColorAnimation(final Shape shape, final Color... colors) {
+		return UnnamedFXTools.applyHoverColorAnimation(shape, colors);
+	}
+
+	public static Transition applyHoverColorAnimation(final Shape shape, final Duration duration,
+			final Color... colors) {
+		return UnnamedFXTools.applyHoverColorAnimation(shape, duration, colors);
+	}
+
+	public static Transition buildColorwheelTransition(final Shape shape) {
+		return UnnamedFXTools.buildColorwheelTransition(shape);
+	}
+
+	public static Transition buildColorwheelTransition(final Shape shape, final Color... colors) {
+		return UnnamedFXTools.buildColorwheelTransition(shape, colors);
+	}
+
+	public static Transition buildColorwheelTransition(final Shape shape, final Duration duration) {
+		return UnnamedFXTools.buildColorwheelTransition(shape, duration);
+	}
+
+	public static Transition buildColorwheelTransition(final Shape shape, final Duration duration,
+			final Color... colors) {
+
+		return UnnamedFXTools.buildColorwheelTransition(shape, duration, colors);
 	}
 
 	public static Background getBackgroundFromColor(final Color color) {
 		return ChatRoomFXTools.getBackgroundFromColor(color);
+	}
+
+	public static Background getBackgroundFromColor(final Paint color) {
+		return UnnamedFXTools.getBackgroundFromColor(color);
+	}
+
+	public static Background getBackgroundFromColor(final Paint color, final double radius) {
+		return UnnamedFXTools.getBackgroundFromColor(color, radius);
+	}
+
+	public static Border getBorderFromColor(final Paint color) {
+		return UnnamedFXTools.getBorderFromColor(color);
+	}
+
+	public static Border getBorderFromColor(final Paint color, final double width) {
+		return UnnamedFXTools.getBorderFromColor(color, width);
+	}
+
+	public static Border getBorderFromColor(final Paint color, final double width, final double radii) {
+		return UnnamedFXTools.getBorderFromColor(color, width, radii);
+	}
+
+	public static void setDefaultBackground(final Region item) {
+		UnnamedFXTools.setDefaultBackground(item);
 	}
 
 	/**
@@ -86,73 +151,11 @@ public final class FXTools {
 		ChatRoomFXTools.spawnLabelAtMousePos(text, color, stage);
 	}
 
-	public static void addPopup(Node node, Parent popupRoot, Window stage) {
-		ChatRoomFXTools.addPopup(node, popupRoot, stage);
-	}
-
-	public static Label addHoverText(Node node, String text, Window stage) {
-		return ChatRoomFXTools.addHoverText(node, text, stage);
-	}
-
-	public static Label addHoverText(Node node, String text, Color backgroundColor, Window stage) {
-		return ChatRoomFXTools.addHoverText(node, text, backgroundColor, stage);
-	}
-
-	public static Background getBackgroundFromColor(Paint color) {
-		return UnnamedFXTools.getBackgroundFromColor(color);
-	}
-
-	public static Background getBackgroundFromColor(Paint color, double radius) {
-		return UnnamedFXTools.getBackgroundFromColor(color, radius);
-	}
-
-	public static Border getBorderFromColor(Paint color) {
-		return UnnamedFXTools.getBorderFromColor(color);
-	}
-
-	public static Border getBorderFromColor(Paint color, double width) {
-		return UnnamedFXTools.getBorderFromColor(color, width);
-	}
-
-	public static Border getBorderFromColor(Paint color, double width, double radii) {
-		return UnnamedFXTools.getBorderFromColor(color, width, radii);
-	}
-
-	public static Transition applyHoverColorAnimation(Shape shape, Duration duration, Color... colors) {
-		return UnnamedFXTools.applyHoverColorAnimation(shape, duration, colors);
-	}
-
-	public static Transition buildColorwheelTransition(Shape shape, Duration duration, Color... colors) {
-
-		return UnnamedFXTools.buildColorwheelTransition(shape, duration, colors);
-	}
-
-	public static Transition buildColorwheelTransition(Shape shape, Color... colors) {
-		return UnnamedFXTools.buildColorwheelTransition(shape, colors);
-	}
-
-	public static Transition buildColorwheelTransition(Shape shape, Duration duration) {
-		return UnnamedFXTools.buildColorwheelTransition(shape, duration);
-	}
-
-	public static Transition buildColorwheelTransition(Shape shape) {
-		return UnnamedFXTools.buildColorwheelTransition(shape);
-	}
-
-	public static Transition applyHoverColorAnimation(Shape shape, Color... colors) {
-		return UnnamedFXTools.applyHoverColorAnimation(shape, colors);
-	}
-
-	public static Transition applyHoverColorAnimation(Shape shape) {
-		return UnnamedFXTools.applyHoverColorAnimation(shape);
-	}
-
-	public static void styleBasicInput(Region... inputs) {
+	public static void styleBasicInput(final Region... inputs) {
 		UnnamedFXTools.styleBasicInput(inputs);
 	}
 
-	public static void setDefaultBackground(Region item) {
-		UnnamedFXTools.setDefaultBackground(item);
+	private FXTools() {
 	}
 
 }

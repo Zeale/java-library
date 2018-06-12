@@ -15,7 +15,7 @@ public class Dialogue<PT extends Parent> {
 	 */
 	protected final PT root, pane;
 
-	public Dialogue(PT root, Stage stage) {
+	public Dialogue(final PT root, final Stage stage) {
 		this.root = pane = root;
 		this.stage = stage;
 		stage.setScene(new Scene(root));
@@ -24,15 +24,15 @@ public class Dialogue<PT extends Parent> {
 		getScene().setFill(Color.TRANSPARENT);
 	}
 
-	protected final Scene getScene() {
-		return stage.getScene();
-	}
-
 	protected void build() {
 	}
 
 	public void close() {
 		stage.close();
+	}
+
+	protected final Scene getScene() {
+		return stage.getScene();
 	}
 
 	public void hide() {

@@ -9,8 +9,6 @@ import javafx.scene.layout.Region;
 
 public class ResizeOperator implements EventHandler<MouseEvent> {
 
-	private final BooleanProperty enabled = new SimpleBooleanProperty(true);
-
 	protected final class Drag {
 		public final boolean top, bottom, left, right;
 		public double sx, sy;
@@ -32,6 +30,8 @@ public class ResizeOperator implements EventHandler<MouseEvent> {
 	public enum Side {
 		TOP, BOTTOM, LEFT, RIGHT;
 	}
+
+	private final BooleanProperty enabled = new SimpleBooleanProperty(true);
 
 	private final Region region;
 	private int resizeMargin = 8;
@@ -61,6 +61,10 @@ public class ResizeOperator implements EventHandler<MouseEvent> {
 
 	protected boolean bottomright(final MouseEvent e) {
 		return bottom(e) && right(e);
+	}
+
+	public final BooleanProperty enabledProperty() {
+		return enabled;
 	}
 
 	@Override
@@ -118,19 +122,22 @@ public class ResizeOperator implements EventHandler<MouseEvent> {
 		if (drag == null)
 			return;
 
-		double distance = Math.sqrt(Math.pow(drag.startX - e.getX(), 2) + Math.pow(drag.startY - e.getY(), 2));
-		if (distance <= 1.35 * resizeMargin) {
+		final double distance = Math.sqrt(Math.pow(drag.startX - e.getX(), 2) + Math.pow(drag.startY - e.getY(), 2));
+		if (distance <= 1.35 * resizeMargin)
 			e.getPickResult().getIntersectedNode()
 					.fireEvent(new MouseEvent(this, null, MouseEvent.MOUSE_CLICKED, e.getX(), e.getY(), e.getScreenX(),
 							e.getScreenY(), e.getButton(), 1, e.isShiftDown(), e.isControlDown(), e.isAltDown(),
 							e.isMetaDown(), e.isPrimaryButtonDown(), e.isMiddleButtonDown(), e.isSecondaryButtonDown(),
 							true, false, true, e.getPickResult()));
-		}
 		drag = null;
 	}
 
 	private boolean inRange(final MouseEvent event) {
 		return top(event) || bottom(event) || left(event) || right(event);
+	}
+
+	public final boolean isEnabled() {
+		return enabledProperty().get();
 	}
 
 	protected boolean left(final MouseEvent e) {
@@ -139,6 +146,10 @@ public class ResizeOperator implements EventHandler<MouseEvent> {
 
 	protected boolean right(final MouseEvent e) {
 		return e.getX() >= region.getWidth() - resizeMargin;
+	}
+
+	public final void setEnabled(final boolean enabled) {
+		enabledProperty().set(enabled);
 	}
 
 	private void setup() {
@@ -186,18 +197,6 @@ public class ResizeOperator implements EventHandler<MouseEvent> {
 		//
 		// Since both operations are executed separately, the window jitters often.
 
-	}
-
-	public final BooleanProperty enabledProperty() {
-		return this.enabled;
-	}
-
-	public final boolean isEnabled() {
-		return this.enabledProperty().get();
-	}
-
-	public final void setEnabled(final boolean enabled) {
-		this.enabledProperty().set(enabled);
 	}
 
 }
