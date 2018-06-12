@@ -1,5 +1,6 @@
 package org.alixia.chatroom.api.commands;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -39,42 +40,131 @@ public class CommandManager {
 		consumers.push(consumer);
 	}
 
-	/**
-	 * This method operates assuming the precondition that the first character of
-	 * the trimmed value of <code>rawInput</code> is "<code>/</code>". If such is
-	 * not the case, this method will improperly attempt to match the input with
-	 * commands' names, and, as a result, call those commands.
-	 *
-	 * @param rawInput
-	 *            The user's command, with the arguments as one whole string. This
-	 *            should start with "<code>/</code>".
-	 */
-	public boolean runCommand(final String rawInput) {
+	public final boolean runCommand(final String rawInput) {
 
 		String input = rawInput.trim();
 
-		// Get rid of duplicate spaces.
-		while (input.contains("  "))
-			input = input.replaceAll("  ", " ");
+		class Parser {
+			int position;
+			private final String text;
 
-		// Handle no args.
-		if (!input.contains(" "))
-			if (input.isEmpty())
-				return runCommand("", new String[0]);
-			else
-				return runCommand(input.substring(hasConsumer() ? 0 : commandChar.length()), new String[0]);
+			int getNextChar() {
+				return position >= text.length() ? -1 : text.charAt(position++);
+			}
 
-		// Handle args.
-		final String cmd = input.substring(hasConsumer() ? 0 : commandChar.length(), input.indexOf(" "));
+			public Parser(String text) {
+				this.text = text;
+			}
 
-		final String args = input.substring(input.indexOf(" ") + 1);
-		final String[] argArr = args.split(" ");
-
-		if (hasConsumer()) {
-			consumers.pop().consume(cmd, args);
-			return true;
 		}
-		return runCommand(cmd, argArr);
+
+		Parser parser = new Parser(input);
+
+		// This might be replaceable with a quick call to
+		// "startsWith(getCommandChar())"...
+		int commandCharLength = getCommandChar().length();
+		while (parser.position < commandCharLength)
+			if (parser.getNextChar() != getCommandChar().charAt(parser.position - 1))
+				return false;
+
+		String command = "";
+		boolean quoted = false, backslashed = false;
+
+		int c;
+		// Parse the command.
+		while (true) {
+			c = parser.getNextChar();
+
+			// If we've reached the end of the line (in this command name parser) then just
+			// call the command with no args.
+			if (c == -1) {
+				if (backslashed)
+					command += '\\';
+				return runCommand(command, new String[0]);
+			}
+
+			if (backslashed) {
+				if (c == '\\')
+					command += '\\';
+				else if (c == '"')
+					command += '"';
+				else
+					command += '\\';
+				backslashed = false;
+			} else if (c == '\\') {
+				backslashed = true;
+			} else if (quoted) {
+				if (c == '"')
+					quoted = false;
+				else
+					command += (char) c;
+			} else if (c == '"') {
+				quoted = true;
+			} else if (Character.isWhitespace(c))
+				break;
+			else
+				command += (char) c;
+
+		}
+
+		// The above while loop ends with the character of whitespace right after the
+		// command, so we start after that.
+		//
+		// "/test something"
+		// We are at the "s" in "something"
+
+		List<String> args = new ArrayList<>();
+		String arg = "";
+
+		backslashed = false;
+		quoted = false;
+
+		System.out.println(parser.position + " " + (char) c);
+		while (Character.isWhitespace(c = parser.getNextChar()))
+			;
+
+		System.out.println(parser.position + " " + (char) c);
+
+		while (true) {
+
+			if (c == -1) {
+				if (backslashed)
+					arg += '\\';
+				args.add(arg);
+				return runCommand(command, args.toArray(new String[0]));
+			}
+
+			if (backslashed) {
+				if (c == '\\')
+					arg += '\\';
+				else if (c == '"')
+					arg += '"';
+				else
+					arg += "\\";
+				backslashed = false;
+			} else if (c == '\\') {
+				backslashed = true;
+			} else if (quoted) {
+				if (c == '"')
+					quoted = false;
+				else
+					arg += (char) c;
+			} else if (c == '"') {
+				quoted = true;
+			} else if (Character.isWhitespace(c)) {
+				while (Character.isWhitespace(c = parser.getNextChar()))
+					;
+
+				args.add(arg);
+				arg = "";
+
+				if (c == -1)
+					return runCommand(command, args.toArray(new String[0]));
+				continue;// Skip the c=parser.getNextChar() below.
+			} else
+				arg += (char) c;
+			c = parser.getNextChar();
+		}
 
 	}
 
@@ -88,8 +178,7 @@ public class CommandManager {
 	 * @return <code>true</code> if the input command was matched to a command in
 	 *         this {@link CommandManager}, false otherwise.
 	 */
-	public boolean runCommand(final String... args) {
-
+	public final boolean runCommand(final String... args) {
 		String name;
 
 		// Get the command's name.
@@ -109,7 +198,7 @@ public class CommandManager {
 	}
 
 	public boolean runCommand(final String cmd, final String... args) {
-		if (!consumers.isEmpty()) {
+		if (hasConsumer()) {
 			consumers.pop().consume(cmd, args);
 			return true;
 		}
