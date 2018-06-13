@@ -1,5 +1,7 @@
 package org.alixia.chatroom.api.commands;
 
+import org.alixia.javalibrary.strings.Tools;
+
 public abstract class Command {
 
 	private CommandManager managerRef;
@@ -30,10 +32,7 @@ public abstract class Command {
 	 * @see #equalsAnyIgnoreCase(String, String...)
 	 */
 	protected final boolean equalsAny(final String arg, final String... possibleMatches) {
-		for (final String s : possibleMatches)
-			if (arg.equals(s))
-				return true;
-		return false;
+		return Tools.equalsAny(arg, possibleMatches);
 	}
 
 	/**
@@ -55,10 +54,7 @@ public abstract class Command {
 	 * @see #equalsAny(String, String...)
 	 */
 	protected final boolean equalsAnyIgnoreCase(final String arg, final String... possibleMatches) {
-		for (final String s : possibleMatches)
-			if (arg.equalsIgnoreCase(s))
-				return true;
-		return false;
+		return Tools.equalsAnyIgnoreCase(arg, possibleMatches);
 	}
 
 	/**

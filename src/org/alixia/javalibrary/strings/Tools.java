@@ -40,4 +40,18 @@ public final class Tools {
 		return false;
 	}
 
+	public static boolean equalsAny(final String arg, final String... possibleMatches) {
+		for (final String s : possibleMatches)
+			if (arg.equals(s))
+				return true;
+		return false;
+	}
+
+	public static boolean equalsAnyIgnoreCase(final String arg, final String... possibleMatches) {
+		for (final String s : possibleMatches)
+			if (arg.equalsIgnoreCase(s))
+				return true;
+		return false;
+	}
+
 }
