@@ -3,6 +3,7 @@ package org.alixia.javalibrary.javafx.images;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
+import org.alixia.javalibrary.javafx.images.Images.LoadedImageReceiver.Receiver.ImageType;
 import org.alixia.javalibrary.taskloader.TaskLoader;
 
 import javafx.scene.image.Image;
@@ -29,9 +30,9 @@ public class Images {
 		@Override
 		public void handle() {
 			try {
-				receiver.onLoaded.accept(new Image(inputStream));
+				receiver.imageHandler.receive(new Image(inputStream), ImageType.SUCCESS);
 			} catch (Exception e) {
-				receiver.onLoaded.accept(getRandomMissingTextureIcon());
+				receiver.imageHandler.receive(getRandomMissingTextureIcon(), ImageType.FAILURE);
 			}
 		}
 
@@ -41,13 +42,13 @@ public class Images {
 		return MISSING_TEXTURE_IMAGES;
 	}
 
-	public static final String GRAPHICS_LOCATION = "/branch/alixia/kröw/unnamed/resources/graphics/";
+	private static final String PRIVATE_GRAPHICS_LOCATION = "/branch/alixia/kröw/unnamed/resources/graphics/";
 
 	// This array's initialization may need to be run in a dedicated thread if too
 	// many large images are being used as Missing Texture Graphics.
 	private static final Image[] MISSING_TEXTURE_IMAGES = new Image[] {
-			new Image(GRAPHICS_LOCATION + "Missing Texture 1.png"),
-			new Image(GRAPHICS_LOCATION + "Missing Texture 2.png") };
+			new Image(PRIVATE_GRAPHICS_LOCATION + "Missing Texture 1.png", true),
+			new Image(PRIVATE_GRAPHICS_LOCATION + "Missing Texture 2.png", true) };
 
 	public static Image getRandomMissingTextureIcon() {
 		Image[] missingTextureIcons = getMissingTextureIcons();
@@ -73,10 +74,11 @@ public class Images {
 		@Override
 		public void handle() {
 			try {
-				super.receiver.onLoaded
-						.accept(new Image(super.inputStream, requestedWidth, requestedHeight, preserveRatio, smooth));
+				super.receiver.imageHandler.receive(
+						new Image(super.inputStream, requestedWidth, requestedHeight, preserveRatio, smooth),
+						ImageType.SUCCESS);
 			} catch (Exception e) {
-				super.receiver.onLoaded.accept(getRandomMissingTextureIcon());
+				super.receiver.imageHandler.receive(getRandomMissingTextureIcon(), ImageType.FAILURE);
 			}
 		}
 
@@ -90,14 +92,28 @@ public class Images {
 	 *
 	 */
 	public static class LoadedImageReceiver {
-		private final Consumer<Image> onLoaded;
+		public @FunctionalInterface interface Receiver {
+			public enum ImageType {
+				SUCCESS, FAILURE, PENDING;
+			}
+
+			void receive(Image image, ImageType type);
+
+		}
+
+		private final Receiver imageHandler;
 
 		public LoadedImageReceiver(ImageView view) {
-			this.onLoaded = view::setImage;
+			this(view::setImage);
 		}
 
 		public LoadedImageReceiver(Consumer<Image> onReceived) {
-			this.onLoaded = onReceived;
+			this((image, type) -> onReceived.accept(image));
+		}
+
+		public LoadedImageReceiver(Receiver receiver) {
+			receiver.receive(getRandomMissingTextureIcon(), ImageType.PENDING);
+			this.imageHandler = receiver;
 		}
 
 	}
