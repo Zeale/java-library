@@ -16,7 +16,7 @@ public final class Logger {
 
 	public Color bracketColor = DEFAULT_LOGGER_COLORS, parentColor = DEFAULT_LOGGER_COLORS,
 			childColor = DEFAULT_LOGGER_COLORS, separatorColor = DEFAULT_LOGGER_COLORS,
-			messageColor = DEFAULT_LOGGER_COLORS;
+			messageColor = DEFAULT_LOGGER_COLORS, messageSeparatorColor = DEFAULT_LOGGER_COLORS;
 
 	public boolean boldHeader = false;
 
@@ -88,8 +88,8 @@ public final class Logger {
 			printer.print(separator, separatorColor, boldHeader, false);
 		}
 		printer.print(getName(), childColor, boldHeader, false);
-		printer.print("]: ", bracketColor, boldHeader, false);
-
+		printer.print("]", bracketColor, boldHeader, false);
+		printer.print(": ", messageSeparatorColor);
 	}
 
 	public void setSeparator(final String separator) {
