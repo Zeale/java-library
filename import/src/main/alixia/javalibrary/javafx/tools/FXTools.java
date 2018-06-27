@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.Region;
@@ -25,6 +26,20 @@ public final class FXTools {
 	public static final Color ITEM_BORDER_COLOR = Color.BLUE;
 	public static final Color SECONDARY_WINDOW_BORDER_COLOR = ITEM_BORDER_COLOR.interpolate(DEFAULT_WINDOW_COLOR, 0.5);
 	public static final double COMMON_BORDER_WIDTH = 2;
+
+	public static void setAllAnchors(double anchorDistance, Node... nodes) {
+		setAllAnchors(anchorDistance, anchorDistance, anchorDistance, anchorDistance, nodes);
+	}
+
+	public static void setAllAnchors(double top, double right, double bottom, double left, Node... nodes) {
+		for (Node n : nodes) {
+			AnchorPane.setTopAnchor(n, top);
+			AnchorPane.setRightAnchor(n, right);
+			AnchorPane.setBottomAnchor(n, bottom);
+			AnchorPane.setLeftAnchor(n, left);
+		}
+
+	}
 
 	public static Label addHoverText(final Node node, final String text, final Color backgroundColor,
 			final Window stage) {
