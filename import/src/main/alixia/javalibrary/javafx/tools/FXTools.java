@@ -5,8 +5,10 @@ import org.alixia.chatroom.api.fx.tools.ChatRoomFXTools;
 import branch.alixia.kröw.unnamed.tools.UnnamedFXTools;
 import javafx.animation.Transition;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
@@ -156,6 +158,21 @@ public final class FXTools {
 	}
 
 	private FXTools() {
+	}
+
+	public static void styleBasicInput(Paint borderColor, Paint activatedBorderColor, Region... inputs) {
+		for (final Region r : inputs) {
+			r.setBackground(UnnamedFXTools
+					.getBackgroundFromColor(UnnamedFXTools.DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
+			r.setBorder(UnnamedFXTools.getBorderFromColor(borderColor));
+			r.getStylesheets().add("branch/alixia/kröw/unnamed/tools/basic-input.css");
+			r.getStyleClass().add("basic-input");
+
+			(r instanceof Button ? ((Button) r).armedProperty() : r.focusedProperty())
+					.addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> r.setBorder(
+							UnnamedFXTools.getBorderFromColor(newValue ? activatedBorderColor : borderColor)));
+
+		}
 	}
 
 }

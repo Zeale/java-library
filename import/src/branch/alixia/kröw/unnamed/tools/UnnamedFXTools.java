@@ -5,11 +5,13 @@ import static javafx.scene.paint.Color.GOLD;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.RED;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javafx.animation.Animation;
 import javafx.animation.FillTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Transition;
-import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Background;
@@ -24,6 +26,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
+import main.alixia.javalibrary.javafx.tools.FXTools;
 
 public final class UnnamedFXTools {
 
@@ -113,18 +116,17 @@ public final class UnnamedFXTools {
 	}
 
 	public static void styleBasicInput(final Region... inputs) {
-		for (final Region r : inputs) {
-			r.setBackground(getBackgroundFromColor(DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
-			r.setBorder(getBorderFromColor(ITEM_BORDER_COLOR));
-			r.getStylesheets().add("branch/alixia/kröw/unnamed/tools/basic-input.css");
-			r.getStyleClass().add("basic-input");
+		LinkedList<Button> buttons = new LinkedList<>();
+		LinkedList<Region> others = new LinkedList<>();
+		for (Region r : inputs)
+			if (r instanceof Button)
+				buttons.add((Button) r);
+			else
+				others.add(r);
 
-			final Color toColor = r instanceof Button ? RED : GREEN;
-			(r instanceof Button ? ((Button) r).armedProperty() : r.focusedProperty())
-					.addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> r
-							.setBorder(getBorderFromColor(newValue ? toColor : ITEM_BORDER_COLOR)));
+		FXTools.styleBasicInput(ITEM_BORDER_COLOR, Color.RED, buttons.toArray(new Button[0]));
+		FXTools.styleBasicInput(ITEM_BORDER_COLOR, Color.GREEN, others.toArray(new Region[0]));
 
-		}
 	}
 
 }
