@@ -129,7 +129,12 @@ public class Images {
 	 * @see Image#Image(String, boolean)
 	 */
 	public static Image loadImageInBackground(String url) {
-		return new Image(url, true);
+		try {
+			return new Image(url, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return getRandomMissingTextureIcon();
+		}
 	}
 
 	public static Image loadImageInBackground(String url, double requestedWidth, double requestedHeight,
