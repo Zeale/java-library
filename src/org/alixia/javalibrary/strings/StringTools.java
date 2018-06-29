@@ -1,14 +1,8 @@
 package org.alixia.javalibrary.strings;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.alixia.chatroom.api.QuickList;
 
 public final class StringTools {
 	/**
@@ -24,43 +18,45 @@ public final class StringTools {
 	 */
 	public static boolean containsIgnoreCase(String string, String... possiblePieces) {
 
-		Map<String, Integer> matchingPieces = new HashMap<>(0);
-		List<String> standbies = new LinkedList<>(), mute = new ArrayList<>();
+		string = string.toLowerCase();
+
+		List<String> standbies = new LinkedList<>();
+		List<Pair> matchingPieces = new LinkedList<>();
 		for (String s : possiblePieces)
 			if (s == null || s.isEmpty())
 				continue;
 			else
-				standbies.add(s.toLowerCase());
+				standbies.add(s);
 
-		for (char c : string.toCharArray()) {
-			for (Iterator<Entry<String, Integer>> iterator = matchingPieces.entrySet().iterator(); iterator
-					.hasNext();) {
-				Entry<String, Integer> e = iterator.next();
-				char nextChar = e.getKey().charAt(e.getValue());
+		char[] charArray = string.toCharArray();
+		for (int i = 0; i < charArray.length; i++) {
+			char c = charArray[i];
+			for (Iterator<Pair> iterator = matchingPieces.iterator(); iterator.hasNext();) {
+				Pair e = iterator.next();
+				char nextChar = Character.toLowerCase(e.string.charAt(e.value));
 				if (nextChar == c) {
-					e.setValue(e.getValue() + 1);
-					if (e.getValue() == e.getKey().length())
+					e.value++;
+					if (e.value == e.getLength())
 						return true;
 				} else
 					iterator.remove();
 			}
-			for (String s : standbies) {
-				char firstChar = s.charAt(0);
-				if (firstChar == c)
-					if (s.length() == 1)
-						return true;
-					else
-						matchingPieces.put(s, 1);
+			for (Iterator<String> iterator = standbies.iterator(); iterator.hasNext();) {
+				String s = iterator.next();
+				if (s.length() > charArray.length - i)
+					iterator.remove();
+				else {
+					char firstChar = Character.toLowerCase(s.charAt(0));
+					if (firstChar == c)
+						if (s.length() == 1)
+							return true;
+						else
+							matchingPieces.add(new Pair(s, 1));
+				}
 			}
 		}
 
 		return false;
-	}
-
-	public static void main(String[] args) {
-		// TODO We had an issue...
-		System.out.println(containsIgnoreCase("ststrong", "strong"));// false
-		// I fixed it doe. :)
 	}
 
 	public static boolean equalsAny(final String arg, final String... possibleMatches) {
