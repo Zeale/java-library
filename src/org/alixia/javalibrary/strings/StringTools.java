@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import org.alixia.chatroom.api.QuickList;
 
-public final class Tools {
+public final class StringTools {
 	public static boolean containsIgnoreCase(String string, String... possiblePieces) {
 
 		Map<String, Integer> matchingPieces = new HashMap<>(0);

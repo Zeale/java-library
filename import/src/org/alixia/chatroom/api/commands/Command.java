@@ -1,6 +1,6 @@
 package org.alixia.chatroom.api.commands;
 
-import org.alixia.javalibrary.strings.Tools;
+import org.alixia.javalibrary.strings.StringTools;
 
 public abstract class Command {
 
@@ -32,7 +32,7 @@ public abstract class Command {
 	 * @see #equalsAnyIgnoreCase(String, String...)
 	 */
 	protected final boolean equalsAny(final String arg, final String... possibleMatches) {
-		return Tools.equalsAny(arg, possibleMatches);
+		return StringTools.equalsAny(arg, possibleMatches);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public abstract class Command {
 	 * @see #equalsAny(String, String...)
 	 */
 	protected final boolean equalsAnyIgnoreCase(final String arg, final String... possibleMatches) {
-		return Tools.equalsAnyIgnoreCase(arg, possibleMatches);
+		return StringTools.equalsAnyIgnoreCase(arg, possibleMatches);
 	}
 
 	/**
