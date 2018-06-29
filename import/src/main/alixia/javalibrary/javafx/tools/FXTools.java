@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
@@ -17,6 +18,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -117,12 +120,10 @@ public final class FXTools {
 	 * Allows the user to drag the given {@link Node} to move the given
 	 * {@link javafx.stage.Window}.
 	 *
-	 * @param window
-	 *            The {@link javafx.stage.Window} that will be moved when the
-	 *            {@link Node} is dragged.
-	 * @param node
-	 *            The {@link javafx.stage.Window} that the user will drag to move
-	 *            the given {@link Stage}.
+	 * @param window The {@link javafx.stage.Window} that will be moved when the
+	 *               {@link Node} is dragged.
+	 * @param node   The {@link javafx.stage.Window} that the user will drag to move
+	 *               the given {@link Stage}.
 	 */
 	public static void setPaneDraggableByNode(final javafx.stage.Window window, final Node node) {
 		ChatRoomFXTools.setPaneDraggableByNode(window, node);
@@ -138,8 +139,7 @@ public final class FXTools {
 	 * on the given {@link Node} to allow the current {@link Application#stage}
 	 * object to be moved via the user dragging the given {@link Node}.
 	 *
-	 * @param node
-	 *            The {@link Node} that will be used to move the WindowManager.
+	 * @param node The {@link Node} that will be used to move the WindowManager.
 	 */
 	public static void setPaneDraggableByNode(final Node node, final Stage stage) {
 		ChatRoomFXTools.setPaneDraggableByNode(node, stage);
@@ -150,14 +150,10 @@ public final class FXTools {
 	 * The source point of the text is specified via the {@code x} and {@code y}
 	 * parameters.
 	 *
-	 * @param text
-	 *            The text to render.
-	 * @param color
-	 *            The color of the rendered text.
-	 * @param x
-	 *            The starting x position of the text.
-	 * @param y
-	 *            The starting y position of the text.
+	 * @param text  The text to render.
+	 * @param color The color of the rendered text.
+	 * @param x     The starting x position of the text.
+	 * @param y     The starting y position of the text.
 	 */
 	public static void spawnLabel(final String text, final Color color, final double x, final double y,
 			final Stage stage) {
@@ -187,6 +183,51 @@ public final class FXTools {
 					.addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> r.setBorder(
 							UnnamedFXTools.getBorderFromColor(newValue ? activatedBorderColor : borderColor)));
 
+		}
+	}
+
+	private static Paint[] inputBorderColors, inputActivatedColors;
+
+	public static void setInputBorderColors(Paint[] inputBorderColors) {
+		if (inputBorderColors != null && inputBorderColors.length == 0)
+			return;
+		FXTools.inputBorderColors = inputBorderColors;
+	}
+
+	public static void setInputActivatedColors(Paint[] inputActivatedColors) {
+		if (inputActivatedColors != null && inputActivatedColors.length == 0)
+			return;
+		FXTools.inputActivatedColors = inputActivatedColors;
+	}
+
+	public static void styleInputs(Region... inputs) {
+		if (inputBorderColors == null && inputActivatedColors == null)
+			styleBasicInput(inputs);
+		else {
+			for (Region r : inputs) {
+				if (r instanceof Labeled) {
+					Labeled labeled = (Labeled) r;
+					labeled.setTextFill(Color.WHITE);
+					labeled.setFont(Font.font("Courier", FontWeight.BOLD, 22));
+				}
+				r.setBackground(FXTools.getBackgroundFromColor(DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
+				r.setBorder(FXTools.getBorderFromColor(inputBorderColors == null ? Color.BLACK
+						: inputBorderColors[(int) (Math.random() * inputBorderColors.length)]));
+				(r instanceof Button ? ((Button) r).armedProperty()
+						: r.focusedProperty())
+								.addListener(
+										(ChangeListener<Boolean>) (observable, oldValue,
+												newValue) -> r
+														.setBorder(
+																UnnamedFXTools.getBorderFromColor(newValue
+																		? inputActivatedColors == null ? Color.BLACK
+																				: inputActivatedColors[(int) (Math
+																						.random()
+																						* inputActivatedColors.length)]
+																		: inputBorderColors == null ? Color.BLACK
+																				: inputBorderColors[(int) (Math.random()
+																						* inputBorderColors.length)])));
+			}
 		}
 	}
 
