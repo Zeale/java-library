@@ -5,12 +5,17 @@ import org.alixia.chatroom.api.fx.tools.ChatRoomFXTools;
 import branch.alixia.kröw.unnamed.tools.UnnamedFXTools;
 import javafx.animation.Transition;
 import javafx.application.Application;
+import javafx.beans.binding.NumberExpression;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
@@ -229,6 +234,51 @@ public final class FXTools {
 																						* inputBorderColors.length)])));
 			}
 		}
+	}
+
+	private static final Object TABLE_COLUMN_RELATIVE_WIDTH_KEY = new Object(),
+			TABLE_VIEW_TOTAL_COLUMN_PROPORTION_KEY = new Object();
+
+	public static void sizeTableViewColumns(TableView<?> tableView) {
+
+		if (tableView.getProperties().containsKey(TABLE_VIEW_TOTAL_COLUMN_PROPORTION_KEY))
+			throw new IllegalArgumentException();
+
+		int count = tableView.getColumns().size();
+		DoubleProperty totalProportion = new SimpleDoubleProperty();
+		tableView.getProperties().put(TABLE_VIEW_TOTAL_COLUMN_PROPORTION_KEY, totalProportion);
+		for (TableColumn<?, ?> tc : tableView.getColumns()) {
+			double value = tc.getProperties().containsKey(TABLE_COLUMN_RELATIVE_WIDTH_KEY)
+					? (double) tc.getProperties().get(TABLE_COLUMN_RELATIVE_WIDTH_KEY)
+					: 1d / count;
+
+			// TODO Fix
+			totalProportion.set(totalProportion.get() + value);
+			tc.prefWidthProperty().bind(tableView.widthProperty().divide(totalProportion).multiply(value));
+		}
+	}
+
+	public static void sizeTableViewColumns(TableView<?> tableView, NumberExpression totalSize) {
+
+		if (tableView.getProperties().containsKey(TABLE_VIEW_TOTAL_COLUMN_PROPORTION_KEY))
+			throw new IllegalArgumentException();
+
+		int count = tableView.getColumns().size();
+		DoubleProperty totalProportion = new SimpleDoubleProperty();
+		tableView.getProperties().put(TABLE_VIEW_TOTAL_COLUMN_PROPORTION_KEY, totalProportion);
+		for (TableColumn<?, ?> tc : tableView.getColumns()) {
+			double value = tc.getProperties().containsKey(TABLE_COLUMN_RELATIVE_WIDTH_KEY)
+					? (double) tc.getProperties().get(TABLE_COLUMN_RELATIVE_WIDTH_KEY)
+					: 1d / count;
+
+			// TODO Fix
+			totalProportion.set(totalProportion.get() + value);
+			tc.prefWidthProperty().bind(totalSize.divide(totalProportion).multiply(value));
+		}
+	}
+
+	public static void setTableColumnRelativeWidth(double portion, TableColumn<?, ?> column) {
+		column.getProperties().put(TABLE_COLUMN_RELATIVE_WIDTH_KEY, portion);
 	}
 
 }
