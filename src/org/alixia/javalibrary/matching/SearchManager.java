@@ -1,19 +1,19 @@
 package org.alixia.javalibrary.matching;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 public class SearchManager<FT, MT extends Matchable<FT>> {
 
 	public SearchManager() {
-		fullList = new LinkedList<>();
+		fullCollection = new LinkedList<>();
 	}
 
-	private final List<MT> fullList;
-	private List<MT> showing = new LinkedList<>(), removed = new LinkedList<>();
+	private final Collection<MT> fullCollection;
+	private Collection<MT> showing = new LinkedList<>(), removed = new LinkedList<>();
 
-	private final List<MT> transferList = new LinkedList<>();
+	private final Collection<MT> transferCollection = new LinkedList<>();
 	private FT currentFilter = null;
 
 	/**
@@ -52,13 +52,13 @@ public class SearchManager<FT, MT extends Matchable<FT>> {
 		if (filter == null) {
 			removed.clear();
 			showing.clear();
-			for (MT m : fullList)
+			for (MT m : fullCollection)
 				(m.matches(filter) ? showing : removed).add(m);
 		} else {
 			for (Iterator<MT> iterator = showing.iterator(); iterator.hasNext();) {
 				MT m = iterator.next();
 				if (!m.matches(filter)) {
-					transferList.add(m);
+					transferCollection.add(m);
 					iterator.remove();
 				}
 			}
@@ -69,13 +69,13 @@ public class SearchManager<FT, MT extends Matchable<FT>> {
 					iterator.remove();
 				}
 			}
-			removed.addAll(transferList);
-			transferList.clear();
+			removed.addAll(transferCollection);
+			transferCollection.clear();
 		}
 
 	}
 
-	public void setShowingList(List<MT> showing) {
+	public void setShowingList(Collection<MT> showing) {
 		if (showing == null)
 			throw new IllegalArgumentException();
 		this.showing = showing;
@@ -87,19 +87,24 @@ public class SearchManager<FT, MT extends Matchable<FT>> {
 	 *              the search manager at any time, they should be added through the
 	 *              {@link #addItem(Matchable)} method.
 	 */
-	public SearchManager(List<MT> items) {
+	public SearchManager(Collection<MT> items) {
 		if (items == null)
 			throw new IllegalArgumentException();
-		fullList = new LinkedList<>(items);
+		fullCollection = new LinkedList<>(items);
+	}
+
+	public SearchManager(Collection<MT> items, Collection<MT> filteredItems) {
+		this(items);
+		setShowingList(filteredItems);
 	}
 
 	public synchronized void addItem(MT item) {
-		fullList.add(item);
+		fullCollection.add(item);
 		(item.matches(currentFilter) ? showing : removed).add(item);
 	}
 
-	public synchronized void removeItem(Matchable<FT> item) {
-		fullList.remove(item);
+	public synchronized void removeItem(MT item) {
+		fullCollection.remove(item);
 		showing.remove(item);
 		removed.remove(item);
 	}
