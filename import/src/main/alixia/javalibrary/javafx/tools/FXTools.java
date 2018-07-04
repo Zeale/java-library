@@ -206,6 +206,11 @@ public final class FXTools {
 	}
 
 	public static void styleInputs(Region... inputs) {
+		styleInputs(-1, inputs);
+	}
+
+	public static void styleInputs(double fontSize, Region... inputs) {
+
 		if (inputBorderColors == null && inputActivatedColors == null)
 			styleBasicInput(inputs);
 		else {
@@ -213,7 +218,7 @@ public final class FXTools {
 				if (r instanceof Labeled) {
 					Labeled labeled = (Labeled) r;
 					labeled.setTextFill(Color.WHITE);
-					labeled.setFont(Font.font("Courier", FontWeight.BOLD, 22));
+					labeled.setFont(Font.font("Courier", FontWeight.BOLD, fontSize));
 				}
 				r.setBackground(FXTools.getBackgroundFromColor(DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
 				r.setBorder(FXTools.getBorderFromColor(inputBorderColors == null ? Color.BLACK
@@ -234,6 +239,7 @@ public final class FXTools {
 																						* inputBorderColors.length)])));
 			}
 		}
+
 	}
 
 	private static final Object TABLE_COLUMN_RELATIVE_WIDTH_KEY = new Object(),
