@@ -8,7 +8,7 @@ public final class Logger {
 
 	private static final Color DEFAULT_LOGGER_COLORS = Color.WHITE;
 
-	private static StyledPrintable defaultPrinter = (text, color, bold, italicized) -> System.out.println(text);
+	private static StyledPrintable defaultPrinter = (text, color, bold, italicized) -> System.out.print(text);
 
 	public static void setPrinter(final StyledPrintable printer) {
 		defaultPrinter = printer;
