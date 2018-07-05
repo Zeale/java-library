@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
@@ -211,6 +212,13 @@ public final class FXTools {
 
 	public static void styleInputs(Region... inputs) {
 		styleInputs(-1, inputs);
+	}
+
+	public static void clearScrollPaneBackground(ScrollPane... scrollPanes) {
+		for (ScrollPane sp : scrollPanes) {
+			sp.getStylesheets().add("branch/alixia/kröw/unnamed/tools/default-background.css");
+			sp.getStyleClass().add("default-background");
+		}
 	}
 
 	public static void styleInputs(Paint color, Paint activatedColor, double fontSize, Region... inputs) {
