@@ -30,9 +30,14 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 public final class FXTools {
-	public static final Color DEFAULT_WINDOW_COLOR = new Color(0.34, 0.34, 0.34, 1);
-	public static final Color ITEM_BORDER_COLOR = Color.BLUE;
-	public static final Color SECONDARY_WINDOW_BORDER_COLOR = ITEM_BORDER_COLOR.interpolate(DEFAULT_WINDOW_COLOR, 0.5);
+	public static final Color DEFAULT_WINDOW_COLOR = new Color(0.34, 0.34, 0.34, 1),
+			DEFAULT_NODE_BACKGROUND_COLOR = DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25),
+			DEFAULT_NODE_BORDER_COLOR = Color.BLACK, ITEM_BORDER_COLOR = Color.BLUE,
+			SECONDARY_WINDOW_BORDER_COLOR = ITEM_BORDER_COLOR.interpolate(DEFAULT_WINDOW_COLOR, 0.5);
+
+	public static final Border DEFAULT_NODE_BORDER = FXTools.getBorderFromColor(DEFAULT_NODE_BORDER_COLOR);
+	public static final Background DEFAULT_NODE_BACKGROUND = FXTools
+			.getBackgroundFromColor(DEFAULT_NODE_BACKGROUND_COLOR);
 	public static final double COMMON_BORDER_WIDTH = 2;
 
 	public static void setAllAnchors(double anchorDistance, Node... nodes) {
@@ -178,8 +183,7 @@ public final class FXTools {
 
 	public static void styleBasicInput(Paint borderColor, Paint activatedBorderColor, Region... inputs) {
 		for (final Region r : inputs) {
-			r.setBackground(UnnamedFXTools
-					.getBackgroundFromColor(UnnamedFXTools.DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
+			r.setBackground(UnnamedFXTools.getBackgroundFromColor(DEFAULT_NODE_BACKGROUND_COLOR));
 			r.setBorder(UnnamedFXTools.getBorderFromColor(borderColor));
 			r.getStylesheets().add("branch/alixia/kröw/unnamed/tools/basic-input.css");
 			r.getStyleClass().add("basic-input");
@@ -209,6 +213,24 @@ public final class FXTools {
 		styleInputs(-1, inputs);
 	}
 
+	public static void styleInputs(Paint color, Paint activatedColor, double fontSize, Region... inputs) {
+		for (Region r : inputs) {
+			if (r instanceof Labeled) {
+				Labeled labeled = (Labeled) r;
+				labeled.setTextFill(Color.WHITE);
+				labeled.setFont(Font.font("Courier", FontWeight.BOLD, fontSize));
+			}
+			r.setBackground(FXTools.getBackgroundFromColor(DEFAULT_NODE_BACKGROUND_COLOR));
+			r.setBorder(FXTools.getBorderFromColor(color));
+
+			(r instanceof Button ? ((Button) r).armedProperty() : r.focusedProperty())
+					.addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
+						r.setBorder(FXTools.getBorderFromColor(newValue ? activatedColor : color));
+					});
+
+		}
+	}
+
 	public static void styleInputs(double fontSize, Region... inputs) {
 
 		if (inputBorderColors == null && inputActivatedColors == null)
@@ -220,9 +242,10 @@ public final class FXTools {
 					labeled.setTextFill(Color.WHITE);
 					labeled.setFont(Font.font("Courier", FontWeight.BOLD, fontSize));
 				}
-				r.setBackground(FXTools.getBackgroundFromColor(DEFAULT_WINDOW_COLOR.interpolate(Color.BLACK, 0.25)));
+				r.setBackground(FXTools.getBackgroundFromColor(DEFAULT_NODE_BACKGROUND_COLOR));
 				r.setBorder(FXTools.getBorderFromColor(inputBorderColors == null ? Color.BLACK
 						: inputBorderColors[(int) (Math.random() * inputBorderColors.length)]));
+
 				(r instanceof Button ? ((Button) r).armedProperty()
 						: r.focusedProperty())
 								.addListener(
