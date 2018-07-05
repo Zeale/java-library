@@ -10,7 +10,7 @@ public final class Logger {
 
 	private static StyledPrintable defaultPrinter = (text, color, bold, italicized) -> System.out.print(text);
 
-	public static void setPrinter(final StyledPrintable printer) {
+	public static void setDefaultPrinter(final StyledPrintable printer) {
 		defaultPrinter = printer;
 	}
 
@@ -20,7 +20,11 @@ public final class Logger {
 
 	public boolean boldHeader = false;
 
-	protected final StyledPrintable printer = defaultPrinter;
+	protected StyledPrintable printer = null;
+
+	public void setPrinter(StyledPrintable printer) {
+		this.printer = printer;
+	}
 
 	private final Logger parent;
 	private final String name;
@@ -69,17 +73,22 @@ public final class Logger {
 		return separator;
 	}
 
+	private StyledPrintable getPrinter() {
+		return printer == null ? defaultPrinter : printer;
+	}
+
 	public void log(final String message) {
 		printIdentifier();
-		printer.println(message, messageColor);
+		getPrinter().println(message, messageColor);
 	}
 
 	public void logBold(final String message) {
 		printIdentifier();
-		printer.print(message + "\n", messageColor, true, false);
+		getPrinter().print(message + "\n", messageColor, true, false);
 	}
 
 	private void printIdentifier() {
+		StyledPrintable printer = getPrinter();
 		printer.print("[", bracketColor, boldHeader, false);
 		final String[] names = getFullName().split("\\.");
 		for (int i = 0; i < names.length - 1; i++) {
