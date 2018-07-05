@@ -216,7 +216,7 @@ public final class FXTools {
 
 	public static void clearScrollPaneBackground(ScrollPane... scrollPanes) {
 		for (ScrollPane sp : scrollPanes) {
-			sp.getStylesheets().add("branch/alixia/kröw/unnamed/tools/default-background.css");
+			sp.getStylesheets().add("/branch/alixia/kröw/unnamed/tools/default-background.css");
 			sp.getStyleClass().add("default-background");
 		}
 	}
