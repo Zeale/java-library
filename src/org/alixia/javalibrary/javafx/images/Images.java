@@ -13,6 +13,17 @@ public class Images {
 
 	private final static TaskLoader<ImageLoadingTask> loader = new TaskLoader<>(ImageLoadingTask::handle);
 
+	/**
+	 * Allows you to run anything you want on the Image loading thread. Note that it
+	 * is up to the programmer to not blot the thread with crap, or block it, etc.
+	 * This method should really only be used for loading images.
+	 * 
+	 * @param task The {@link ImageLoadingTask} to execute.
+	 */
+	public static void runTask(ImageLoadingTask task) {
+		loader.addTask(task);
+	}
+
 	public interface ImageLoadingTask {
 		void handle();
 	}
@@ -123,8 +134,7 @@ public class Images {
 	 * loading option provided by the {@link Image} API. This method will <b>not</b>
 	 * have the same error handling features as the API provided by this class.
 	 * 
-	 * @param url
-	 *            The url pointing to the image.
+	 * @param url The url pointing to the image.
 	 * @return The loaded {@link Image}.
 	 * @see Image#Image(String, boolean)
 	 */
@@ -156,11 +166,10 @@ public class Images {
 	 * Convenience method to load an image in the background and then put it into an
 	 * {@link ImageView}.
 	 * 
-	 * @param inputStream
-	 *            An {@link InputStream} through which the {@link Image} will be
-	 *            obtained.
-	 * @param imageView
-	 *            The {@link ImageView} to put the loaded {@link Image} into.
+	 * @param inputStream An {@link InputStream} through which the {@link Image}
+	 *                    will be obtained.
+	 * @param imageView   The {@link ImageView} to put the loaded {@link Image}
+	 *                    into.
 	 */
 	public static void loadImageInBackground(InputStream inputStream, ImageView imageView) {
 		loadImageInBackground(inputStream, new LoadedImageReceiver(imageView));
