@@ -43,6 +43,8 @@ public class CommandManager {
 	public final boolean runCommand(final String rawInput) {
 
 		final String input = rawInput.trim();
+		if (input.isEmpty())
+			return false;
 
 		class Parser {
 			int position;
@@ -113,6 +115,8 @@ public class CommandManager {
 		// "/test something"
 		// We are at the "s" in "something"
 
+		// Also, these two loops are very similar... but are repeated... // TODO
+
 		final List<String> args = new ArrayList<>();
 		String arg = "";
 
@@ -172,9 +176,8 @@ public class CommandManager {
 	 * Runs a command where the command's name is the first item in the string array
 	 * and the command's arguments are the remaining items in the string array.
 	 *
-	 * @param args
-	 *            The string array containing the command name and the given
-	 *            arguments.
+	 * @param args The string array containing the command name and the given
+	 *             arguments.
 	 * @return <code>true</code> if the input command was matched to a command in
 	 *         this {@link CommandManager}, false otherwise.
 	 */
