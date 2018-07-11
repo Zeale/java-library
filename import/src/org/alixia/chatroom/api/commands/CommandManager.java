@@ -41,6 +41,8 @@ public class CommandManager {
 	}
 
 	public final boolean runCommand(final String rawInput) {
+		if (rawInput == null)
+			return false;
 
 		final String input = rawInput.trim();
 		if (input.isEmpty())
