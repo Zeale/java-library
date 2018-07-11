@@ -4,9 +4,6 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public class NonNullSimpleObjectProperty<T> extends SimpleObjectProperty<T> {
 
-	public NonNullSimpleObjectProperty() {
-	}
-
 	public NonNullSimpleObjectProperty(T initialValue) {
 		super(initialValue);
 	}
