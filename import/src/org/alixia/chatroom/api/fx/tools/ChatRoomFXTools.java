@@ -10,9 +10,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -27,14 +29,21 @@ public final class ChatRoomFXTools {
 	}
 
 	public static Label addHoverText(final Node node, final String text, final Window stage) {
+		return addHoverText(node, new Label(text), stage);
+	}
 
-		final Label label = new Label(text);
+	public static Label addHoverText(Node node, Label text, Window stage) {
+		addHoverNode(node, text, stage);
+		return text;
+	}
+
+	public static void addHoverNode(Node node, Node hoverNode, Window stage) {
 
 		new Object() {
 			private final Popup popup = new Popup();
 
 			{
-				popup.getScene().setRoot(label);
+				popup.getScene().setRoot(new AnchorPane(hoverNode));
 
 				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
 					popup.setX(event.getScreenX());
@@ -45,8 +54,6 @@ public final class ChatRoomFXTools {
 				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
 			}
 		};
-
-		return label;
 
 	}
 
@@ -60,7 +67,8 @@ public final class ChatRoomFXTools {
 				node.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
 					popup.setX(event.getScreenX());
 					popup.setY(event.getScreenY() - 50);
-					popup.show(stage);
+					if (!popup.isShowing())
+						popup.show(stage);
 					popup.sizeToScene();
 				});
 				node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> popup.hide());
@@ -76,12 +84,10 @@ public final class ChatRoomFXTools {
 	 * Allows the user to drag the given {@link Node} to move the given
 	 * {@link javafx.stage.Window}.
 	 *
-	 * @param window
-	 *            The {@link javafx.stage.Window} that will be moved when the
-	 *            {@link Node} is dragged.
-	 * @param node
-	 *            The {@link javafx.stage.Window} that the user will drag to move
-	 *            the given {@link Stage}.
+	 * @param window The {@link javafx.stage.Window} that will be moved when the
+	 *               {@link Node} is dragged.
+	 * @param node   The {@link javafx.stage.Window} that the user will drag to move
+	 *               the given {@link Stage}.
 	 */
 	public static void setPaneDraggableByNode(final javafx.stage.Window window, final Node node) {
 		new Object() {
@@ -113,8 +119,7 @@ public final class ChatRoomFXTools {
 	 * on the given {@link Node} to allow the current {@link Application#stage}
 	 * object to be moved via the user dragging the given {@link Node}.
 	 *
-	 * @param node
-	 *            The {@link Node} that will be used to move the WindowManager.
+	 * @param node The {@link Node} that will be used to move the WindowManager.
 	 */
 	public static void setPaneDraggableByNode(final Node node, final Stage stage) {
 		/**
@@ -148,14 +153,10 @@ public final class ChatRoomFXTools {
 	 * The source point of the text is specified via the {@code x} and {@code y}
 	 * parameters.
 	 *
-	 * @param text
-	 *            The text to render.
-	 * @param color
-	 *            The color of the rendered text.
-	 * @param x
-	 *            The starting x position of the text.
-	 * @param y
-	 *            The starting y position of the text.
+	 * @param text  The text to render.
+	 * @param color The color of the rendered text.
+	 * @param x     The starting x position of the text.
+	 * @param y     The starting y position of the text.
 	 */
 	public static void spawnLabel(final String text, final Color color, final double x, final double y,
 			final Stage stage) {

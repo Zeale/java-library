@@ -125,11 +125,8 @@ public class CommandManager {
 		backslashed = false;
 		quoted = false;
 
-		System.out.println(parser.position + " " + (char) c);
 		while (Character.isWhitespace(c = parser.getNextChar()))
 			;
-
-		System.out.println(parser.position + " " + (char) c);
 
 		while (true) {
 

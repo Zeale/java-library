@@ -26,6 +26,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -62,6 +63,10 @@ public final class FXTools {
 
 	public static Label addHoverText(final Node node, final String text, final Window stage) {
 		return ChatRoomFXTools.addHoverText(node, text, stage);
+	}
+
+	public static void addHoverNode(Node node, Node hoverNode, Window stage) {
+		ChatRoomFXTools.addHoverNode(node, hoverNode, stage);
 	}
 
 	public static void addPopup(final Node node, final Parent popupRoot, final Window stage) {
