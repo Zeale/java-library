@@ -20,4 +20,10 @@ public class QuickList<E> extends LinkedList<E> {
 			add(e);
 	}
 
+	public void setAll(Collection<E> subList) {
+		clear();
+		for (E e : subList)
+			add(e);
+	}
+
 }
