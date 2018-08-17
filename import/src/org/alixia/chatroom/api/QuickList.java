@@ -26,4 +26,9 @@ public class QuickList<E> extends LinkedList<E> {
 			add(e);
 	}
 
+	public void addAll(E... es) {
+		for (E e : es)
+			add(e);
+	}
+
 }
