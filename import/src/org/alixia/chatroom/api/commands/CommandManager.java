@@ -40,7 +40,63 @@ public class CommandManager {
 		consumers.push(consumer);
 	}
 
-	public final boolean runCommand(final String rawInput) {
+	public final boolean runCommand(String input) {
+		input = input.trim();
+		class Parser {
+			int position;
+			private final String text;
+
+			public Parser(final String text) {
+				this.text = text;
+			}
+
+			int getNextChar() {
+				return position >= text.length() ? -1 : text.charAt(position++);
+			}
+
+		}
+
+		final Parser parser = new Parser(input);
+
+		// This might be replaceable with a quick call to
+		// "startsWith(getCommandChar())"...
+		final int commandCharLength = getCommandChar().length();
+		while (parser.position < commandCharLength)
+			if (parser.getNextChar() != getCommandChar().charAt(parser.position - 1))
+				return false;
+		return runCommandRaw(input.substring(commandCharLength));
+	}
+
+	/**
+	 * Runs a command where the command's name is the first item in the string array
+	 * and the command's arguments are the remaining items in the string array.
+	 *
+	 * @param args The string array containing the command name and the given
+	 *             arguments.
+	 * @return <code>true</code> if the input command was matched to a command in
+	 *         this {@link CommandManager}, false otherwise.
+	 */
+	public final boolean runCommand(final String... args) {
+		String name;
+
+		// Get the command's name.
+		if (args.length == 0)
+			name = "";
+		else
+			name = args[0];
+
+		// Make an args array.
+		final String[] newArgs = new String[args.length - 1];
+
+		// Populate the new args array.
+		for (int i = 1; i < args.length; i++)
+			newArgs[i - 1] = args[i];
+
+		return runCommandRaw(name, newArgs);
+	}
+
+	public boolean runCommandRaw(String rawInput) {
+
 		if (rawInput == null)
 			return false;
 
@@ -64,13 +120,6 @@ public class CommandManager {
 
 		final Parser parser = new Parser(input);
 
-		// This might be replaceable with a quick call to
-		// "startsWith(getCommandChar())"...
-		final int commandCharLength = getCommandChar().length();
-		while (parser.position < commandCharLength)
-			if (parser.getNextChar() != getCommandChar().charAt(parser.position - 1))
-				return false;
-
 		String command = "";
 		boolean quoted = false, backslashed = false;
 
@@ -84,7 +133,7 @@ public class CommandManager {
 			if (c == -1) {
 				if (backslashed)
 					command += '\\';
-				return runCommand(command, new String[0]);
+				return runCommandRaw(command, new String[0]);
 			}
 
 			if (backslashed) {
@@ -134,7 +183,7 @@ public class CommandManager {
 				if (backslashed)
 					arg += '\\';
 				args.add(arg);
-				return runCommand(command, args.toArray(new String[0]));
+				return runCommandRaw(command, args.toArray(new String[0]));
 			}
 
 			if (backslashed) {
@@ -162,7 +211,7 @@ public class CommandManager {
 				arg = "";
 
 				if (c == -1)
-					return runCommand(command, args.toArray(new String[0]));
+					return runCommandRaw(command, args.toArray(new String[0]));
 				continue;// Skip the c=parser.getNextChar() below.
 			} else
 				arg += (char) c;
@@ -171,35 +220,7 @@ public class CommandManager {
 
 	}
 
-	/**
-	 * Runs a command where the command's name is the first item in the string array
-	 * and the command's arguments are the remaining items in the string array.
-	 *
-	 * @param args The string array containing the command name and the given
-	 *             arguments.
-	 * @return <code>true</code> if the input command was matched to a command in
-	 *         this {@link CommandManager}, false otherwise.
-	 */
-	public final boolean runCommand(final String... args) {
-		String name;
-
-		// Get the command's name.
-		if (args.length == 0)
-			name = "";
-		else
-			name = args[0];
-
-		// Make an args array.
-		final String[] newArgs = new String[args.length - 1];
-
-		// Populate the new args array.
-		for (int i = 1; i < args.length; i++)
-			newArgs[i - 1] = args[i];
-
-		return runCommand(name, newArgs);
-	}
-
-	public boolean runCommand(final String cmd, final String... args) {
+	public boolean runCommandRaw(final String cmd, final String... args) {
 		if (hasConsumer()) {
 			consumers.pop().consume(cmd, args);
 			return true;
