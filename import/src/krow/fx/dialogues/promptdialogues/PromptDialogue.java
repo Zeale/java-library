@@ -73,6 +73,7 @@ public class PromptDialogue<K, V> extends Dialog<Map<K, V>> {
 		public BasicPrompt(final K key, final String description, final String hint, final String defaultValue) {
 			this(key, description);
 			setHint(hint);
+			setValue(defaultValue);
 		}
 
 		@Override
