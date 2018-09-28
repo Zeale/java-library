@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Stack;
 
 public class CommandManager {
+	public static final class ReceivedCommand {
+		public final String name, args[];
+
+		public ReceivedCommand(String name, String... args) {
+			this.name = name;
+			this.args = args;
+		}
+
+	}
+
 	private final List<Command> commands = new LinkedList<>();
 
 	private final Stack<CommandConsumer> consumers = new Stack<>();
@@ -41,30 +51,8 @@ public class CommandManager {
 	}
 
 	public final boolean runCommand(String input) {
-		input = input.trim();
-		class Parser {
-			int position;
-			private final String text;
-
-			public Parser(final String text) {
-				this.text = text;
-			}
-
-			int getNextChar() {
-				return position >= text.length() ? -1 : text.charAt(position++);
-			}
-
-		}
-
-		final Parser parser = new Parser(input);
-
-		// This might be replaceable with a quick call to
-		// "startsWith(getCommandChar())"...
-		final int commandCharLength = getCommandChar().length();
-		while (parser.position < commandCharLength)
-			if (parser.getNextChar() != getCommandChar().charAt(parser.position - 1))
-				return false;
-		return runCommandRaw(input.substring(commandCharLength));
+		ReceivedCommand cmd = parseCommand(input, commandChar);
+		return cmd == null ? false : runCommandRaw(cmd.name, cmd.args);
 	}
 
 	/**
@@ -95,14 +83,27 @@ public class CommandManager {
 		return runCommandRaw(name, newArgs);
 	}
 
-	public boolean runCommandRaw(String rawInput) {
+	public boolean runCommandRaw(final String cmd, final String... args) {
+		if (hasConsumer()) {
+			if (consumers.peek().consume(cmd, args))
+				consumers.pop();
+			return true;
+		}
+		for (final Command c : commands)
+			if (c.match(cmd)) {
+				c.act(cmd, args);
+				return true;
+			}
+		return false;
+	}
 
-		if (rawInput == null)
-			return false;
+	public void setCommandChar(final String commandChar) {
+		this.commandChar = commandChar;
+	}
 
-		final String input = rawInput.trim();
-		if (input.isEmpty())
-			return false;
+	public static ReceivedCommand parseCommand(String rawInput, String commandChar) {
+		if (rawInput == null || commandChar == null || (rawInput = rawInput.trim()).isEmpty())
+			return null;
 
 		class Parser {
 			int position;
@@ -118,7 +119,14 @@ public class CommandManager {
 
 		}
 
-		final Parser parser = new Parser(input);
+		final Parser parser = new Parser(rawInput);
+
+		// This might be replaceable with a quick call to
+		// "startsWith(getCommandChar())"...
+		final int commandCharLength = commandChar.length();
+		while (parser.position < commandCharLength)
+			if (parser.getNextChar() != commandChar.charAt(parser.position - 1))
+				return null;
 
 		String command = "";
 		boolean quoted = false, backslashed = false;
@@ -133,7 +141,7 @@ public class CommandManager {
 			if (c == -1) {
 				if (backslashed)
 					command += '\\';
-				return runCommandRaw(command, new String[0]);
+				return new ReceivedCommand(command, new String[0]);
 			}
 
 			if (backslashed) {
@@ -183,7 +191,7 @@ public class CommandManager {
 				if (backslashed)
 					arg += '\\';
 				args.add(arg);
-				return runCommandRaw(command, args.toArray(new String[0]));
+				return new ReceivedCommand(command, args.toArray(new String[0]));
 			}
 
 			if (backslashed) {
@@ -211,29 +219,12 @@ public class CommandManager {
 				arg = "";
 
 				if (c == -1)
-					return runCommandRaw(command, args.toArray(new String[0]));
+					return new ReceivedCommand(command, args.toArray(new String[0]));
 				continue;// Skip the c=parser.getNextChar() below.
 			} else
 				arg += (char) c;
 			c = parser.getNextChar();
 		}
 
-	}
-
-	public boolean runCommandRaw(final String cmd, final String... args) {
-		if (hasConsumer()) {
-			consumers.pop().consume(cmd, args);
-			return true;
-		}
-		for (final Command c : commands)
-			if (c.match(cmd)) {
-				c.act(cmd, args);
-				return true;
-			}
-		return false;
-	}
-
-	public void setCommandChar(final String commandChar) {
-		this.commandChar = commandChar;
 	}
 }

@@ -14,12 +14,26 @@ public class MultiCommandConsumer extends CommandConsumer {
 	}
 
 	@Override
-	public void consume(final String command, final String... args) {
+	public boolean consume(final String command, final String... args) {
 		for (final Command c : commands)
 			if (c.match(command)) {
 				c.act(command, args);
-				return;
+				return true;
 			}
+
+		if (inputUnrecognizedCommand != null)
+			inputUnrecognizedCommand.act(command, args);
+		return false;
+	}
+
+	private Command inputUnrecognizedCommand;
+
+	public Command getInputUnrecognizedCommand() {
+		return inputUnrecognizedCommand;
+	}
+
+	public void setInputUnrecognizedCommand(Command inputUnrecognizedCommand) {
+		this.inputUnrecognizedCommand = inputUnrecognizedCommand;
 	}
 
 }
