@@ -102,7 +102,11 @@ public class CommandManager {
 	}
 
 	public static ReceivedCommand parseCommand(String rawInput, String commandChar) {
-		if (rawInput == null || commandChar == null || (rawInput = rawInput.trim()).isEmpty())
+		return rawInput.startsWith(commandChar) ? parseCommand(rawInput.substring(commandChar.length())) : null;
+	}
+
+	public static ReceivedCommand parseCommand(String rawInput) {
+		if (rawInput == null || (rawInput = rawInput.trim()).isEmpty())
 			return null;
 
 		class Parser {
@@ -120,13 +124,6 @@ public class CommandManager {
 		}
 
 		final Parser parser = new Parser(rawInput);
-
-		// This might be replaceable with a quick call to
-		// "startsWith(getCommandChar())"...
-		final int commandCharLength = commandChar.length();
-		while (parser.position < commandCharLength)
-			if (parser.getNextChar() != commandChar.charAt(parser.position - 1))
-				return null;
 
 		String command = "";
 		boolean quoted = false, backslashed = false;
