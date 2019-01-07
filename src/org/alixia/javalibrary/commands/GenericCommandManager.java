@@ -1,14 +1,22 @@
 package org.alixia.javalibrary.commands;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import org.alixia.javalibrary.JavaTools;
+
 public class GenericCommandManager<D> {
 	private final List<GenericCommand<? super D>> commands = new LinkedList<>();
 	private final Stack<GenericCommandConsumer<? super D>> consumers = new Stack<>();
 	private final Stack<OptionalGenericCommandConsumer<? super D>> optionalConsumers = new Stack<>();
+
+	protected final List<GenericCommand<? super D>> commandView = Collections.unmodifiableList(commands);
+	protected final Stack<GenericCommandConsumer<? super D>> consumerView = JavaTools.unmodifiableStack(consumers);
+	protected final Stack<OptionalGenericCommandConsumer<? super D>> optionalConsumerView = JavaTools
+			.unmodifiableStack(optionalConsumers);
 
 	public void addCommand(GenericCommand<? super D> command) {
 		if (!commands.contains(command))
