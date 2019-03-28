@@ -13,6 +13,21 @@ public interface Matching {
 	 */
 	String match(String text);
 
+	/**
+	 * Returns <code>true</code> if the text matched this string. The actual
+	 * implementation of this method actually returns <code>true</code> if the
+	 * returned text from {@link #match(String)} is the same as the input text to
+	 * this method. Since {@link #match(String)} removes whatever matches, and
+	 * returns the rest, if the input is the same as what it returns, nothing should
+	 * have matched.
+	 * 
+	 * @param text The text to match against this object.
+	 * @return <code>!text.equals(this.match(text))</code>
+	 */
+	default boolean matches(String text) {
+		return !text.equals(match(text));
+	}
+
 	static Matching build(String matching) {
 		return text -> text.startsWith(matching) ? text.substring(matching.length()) : null;
 	}
