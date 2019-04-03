@@ -1,5 +1,6 @@
 package org.alixia.javalibrary.commands.processing;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,12 @@ public class StringCommandParser {
 			throw new IllegalArgumentException();
 	}
 
+	public void setCommandInitiator(String commandInitiator) {
+		if (commandInitiator == null)
+			throw new IllegalArgumentException();
+		this.commandInitiator = commandInitiator;
+	}
+
 	public StringCommand parse(String input) {
 		CharacterStream stream = CharacterStream.from(input);
 
@@ -28,18 +35,15 @@ public class StringCommandParser {
 			if (stream.next() != commandInitiator.charAt(i))
 				return null;
 
-		StringBuilder command = new StringBuilder();
-
 		List<String> args = new LinkedList<>();
 
 		int c;
-		while ((c = stream.next()) == ' ')
+		while (Character.isWhitespace(c = stream.next()))
 			;
 
 		boolean quote = false, escaped = false;
 		StringBuilder currArg = new StringBuilder();
 		while (c != -1) {
-			c = stream.next();
 			if (c == '\\') {
 				if (!(escaped ^= true))
 					currArg.append('\\');
@@ -55,22 +59,33 @@ public class StringCommandParser {
 						currArg.append("\\");
 						escaped = false;
 					}
-					currArg.append(c);
+					currArg.append((char) c);
 				} else {
 					args.add(currArg.toString());
 					currArg.setLength(0);
+					while (Character.isWhitespace(c = stream.next()))
+						;
 				}
 			} else {
 				if (escaped) {
 					currArg.append("\\");
 					escaped = false;
 				}
-				currArg.append(c);
+				currArg.append((char) c);
 			}
+			c = stream.next();
 		}
 		args.add(currArg.toString());
 
-		return new StringCommand(command.toString(), input, args.toArray(new String[args.size()]));
+		String command = args.get(0), argArr[] = new String[args.size() - 1];
+		Iterator<String> itr = args.iterator();
+		if (itr.hasNext()) {
+			itr.next();
+			for (int i = 0; itr.hasNext(); argArr[i++] = itr.next())
+				;
+		}
+
+		return new StringCommand(command, input, argArr);
 
 	}
 }

@@ -18,7 +18,7 @@ public interface CharacterStream {
 	static CharacterStream from(String string) {
 		return new CharacterStream() {
 
-			private int pos = -1;
+			private int pos = 0;
 
 			@Override
 			public int next() {
