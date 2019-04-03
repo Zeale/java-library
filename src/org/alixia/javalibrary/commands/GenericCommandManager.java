@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import org.alixia.javalibrary.JavaTools;
 
-public class GenericCommandManager<D> {
+public class GenericCommandManager<D> implements AbstractCommandManager<D> {
 	private final List<GenericCommand<? super D>> commands = new LinkedList<>();
 	private final Stack<GenericCommandConsumer<? super D>> consumers = new Stack<>();
 	private final Stack<OptionalGenericCommandConsumer<? super D>> optionalConsumers = new Stack<>();
@@ -33,14 +33,6 @@ public class GenericCommandManager<D> {
 
 	public void removeConsumer(GenericCommandConsumer<? super D> consumer) {
 		consumers.remove(consumer);
-	}
-
-	public void addConsumer(OptionalGenericCommandConsumer<? super D> consumer) {
-		addOptionalConsumer(consumer);
-	}
-
-	public void removeConsumer(OptionalGenericCommandConsumer<? super D> consumer) {
-		removeOptionalConsumer(consumer);
 	}
 
 	public void addOptionalConsumer(OptionalGenericCommandConsumer<? super D> consumer) {
