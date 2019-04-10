@@ -50,7 +50,7 @@ public class FileStorage {
 	 */
 	public static FileStorage create(String path) {
 		FileStorage storage = new FileStorage(new File(path));
-		return storage.getException() != null ? null : storage;
+		return storage.getException() == null ? null : storage;
 	}
 
 	public class Data {
