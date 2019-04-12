@@ -9,6 +9,50 @@ import zeale.apps.tools.api.data.files.filesystem.storage.exceptions.FileStorage
 
 public class FileStorage {
 
+	/**
+	 * This method attempts to create a {@link FileStorage} with the first given
+	 * {@link String} as a basing path. If this process fails, (see
+	 * {@link #create(String)} for explanation on "fail"), this method will attempt
+	 * to create another {@link FileStorage}, in the same manner as the first, using
+	 * the second given {@link String} as a basing path, if any.
+	 * 
+	 * @param paths The paths to try to create this {@link FileStorage} with, in
+	 *              order.
+	 * @return A working {@link FileStorage} based off the first path {@link String}
+	 *         given, which worked, or <code>null</code> otherwise.
+	 */
+	public static FileStorage create(String... paths) {
+		for (String s : paths) {
+			FileStorage storage = create(s);
+			if (storage != null)
+				return storage;
+		}
+		return null;
+	}
+
+	/**
+	 * <p>
+	 * Attempts to create a {@link FileStorage} based on the specified path. If the
+	 * creation of the actual {@link FileStorage} on the filesystem fails, this
+	 * method will return <code>null</code>.
+	 * </p>
+	 * <p>
+	 * More opaquely, this method attempts to instantiate a {@link FileStorage}. If
+	 * the newly instantiated {@link FileStorage}'s {@link #getException()} method
+	 * returns a value that is not <code>null</code>, this method returns
+	 * <code>null</code>.
+	 * </p>
+	 * 
+	 * @param path The path that the created {@link FileStorage} will represent (if
+	 *             creation succeeds).
+	 * @return <code>null</code> if the {@link FileStorage} creation failed.
+	 *         Otherwise, this method returns the created {@link FileStorage}.
+	 */
+	public static FileStorage create(String path) {
+		FileStorage storage = new FileStorage(new File(path));
+		return storage.getException() == null ? null : storage;
+	}
+
 	public class Data {
 		private final File file;
 		private Exception exception;
@@ -105,6 +149,10 @@ public class FileStorage {
 		this(file, true);
 	}
 
+	public FileStorage(String path) {
+		this(new File(path));
+	}
+
 	private FileStorage(File file, boolean create) {
 		if (file == null)
 			throw null;
@@ -195,7 +243,18 @@ public class FileStorage {
 		return file.isDirectory();
 	}
 
-	public void setException(FileStorageException exception) {
+	/**
+	 * Clears the current exception (if any) and returns it.
+	 * 
+	 * @return The exception that was cleared from this {@link FileStorage}
+	 */
+	private FileStorageException clearException() {
+		FileStorageException exception = getException();
+		this.exception = null;
+		return exception;
+	}
+
+	private void setException(FileStorageException exception) {
 		this.exception = exception;
 	}
 
