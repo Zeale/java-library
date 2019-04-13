@@ -25,6 +25,20 @@ public class KeyMap<V> implements Serializable {
 		return data;
 	}
 
+	/**
+	 * Checks if this {@link KeyMap} can be {@link Serializable serialized} by
+	 * checking if all values are {@link Serializable}.
+	 * 
+	 * @return <code>true</code> if every value in {@link #data} is an
+	 *         {@code instanceof} {@link Serializable}.
+	 */
+	public boolean isSerializable() {
+		for (Object o : data.values())
+			if (!(o instanceof Serializable))
+				return false;
+		return true;
+	}
+
 	public <T extends V> Key<T> put(T data) {
 		Key<T> key = new Key<>();
 		key.put(data);
