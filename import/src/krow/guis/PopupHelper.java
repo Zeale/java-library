@@ -78,14 +78,23 @@ public final class PopupHelper {
 
 			private ScheduledFuture<?> task;
 			private byte eve;
+			private volatile MouseEvent eventObj;
 
 			{
+
+				// Without this, whenever the "open(MouseEvent)" method is called, it's called
+				// with the original mouse enter event that initiates it, even though the user
+				// might have moved the mouse in the delay after the mouse enter event is
+				// passed.
+				node.addEventFilter(MouseEvent.MOUSE_MOVED, e -> eventObj = e);
+
 				node.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+					eventObj = event;
 					if (eve == 3)
 						open(event);
 					else
 						task = service.schedule(() -> Platform.runLater(() -> {
-							open(event);
+							open(eventObj);
 							task = null;
 						}), hoverDelayMillis, TimeUnit.MILLISECONDS);
 					eve = 0;
