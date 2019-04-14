@@ -10,8 +10,10 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
+import main.alixia.javalibrary.javafx.tools.FXTools;
 
 public class VerticalScrollBox extends VBox {
 	private static enum PropertyKeys {
@@ -26,8 +28,7 @@ public class VerticalScrollBox extends VBox {
 	/**
 	 * Convenience method for obtaining a Node's slider.
 	 *
-	 * @param node
-	 *            The node to obtain the slider from.
+	 * @param node The node to obtain the slider from.
 	 * @return The slider obtained from the node.
 	 */
 	private static TranslateTransition getSlider(final Node node) {
@@ -61,7 +62,7 @@ public class VerticalScrollBox extends VBox {
 		final int amount = event.getDeltaY() / event.getMultiplierY() > 0 ? 1 : -1;
 
 		displacement += amount * jumpDistance;
-		final double max = (getChildren().size() - 1) * jumpDistance, min = 0;
+		final double max = (getChildren().size() - 1) * jumpDistance, min = -max;
 		if (displacement > max)
 			displacement = max;
 		else if (displacement < min)
@@ -101,8 +102,8 @@ public class VerticalScrollBox extends VBox {
 		addEventHandler(ScrollEvent.SCROLL, onScroll);
 		setSpacing(getSpacing());
 
-		setStyle(
-				"-fx-background-color:  linear-gradient(to top, #00000020 0%, #000000A8 45%, #000000A8 55%, #00000020 100%);");
+		setBackground(FXTools.getBackgroundFromColor(
+				LinearGradient.valueOf("to top, #00000020 0%, #000000A8 45%, #000000A8 55%, #00000020 100%")));
 
 	}
 
@@ -160,16 +161,14 @@ public class VerticalScrollBox extends VBox {
 	}
 
 	/**
-	 * @param forceHeight
-	 *            the forceHeight to set
+	 * @param forceHeight the forceHeight to set
 	 */
 	public final void setForceHeight(final double forceHeight) {
 		this.forceHeight = forceHeight;
 	}
 
 	/**
-	 * @param forceWidth
-	 *            the forceWidth to set
+	 * @param forceWidth the forceWidth to set
 	 */
 	public final void setForceWidth(final double forceWidth) {
 		this.forceWidth = forceWidth;
