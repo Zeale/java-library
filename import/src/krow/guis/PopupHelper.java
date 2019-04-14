@@ -126,9 +126,9 @@ public final class PopupHelper {
 				node.getProperties().put(LAST_POPUP_KEY, popup);
 
 				if (!popup.isShowing()) {
-					popup.show(node, event.getSceneX(), event.getSceneY());
-					popup.setX(event.getSceneX() - popup.getWidth() / 2);
-					popup.setY(event.getSceneY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
+					popup.show(node, event.getScreenX(), event.getScreenY());
+					popup.setX(event.getScreenX() - popup.getWidth() / 2);
+					popup.setY(event.getScreenY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
 				}
 				openTransition.stop();
 				closeTransition.stop();
@@ -199,9 +199,9 @@ public final class PopupHelper {
 				node.getProperties().put(LAST_POPUP_KEY, popup);
 
 				if (!popup.isShowing()) {
-					popup.show(node, event.getSceneX(), event.getSceneY());
-					popup.setX(event.getSceneX() - popup.getWidth() / 2);
-					popup.setY(event.getSceneY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
+					popup.show(node, event.getScreenX(), event.getScreenY());
+					popup.setX(event.getScreenX() - popup.getWidth() / 2);
+					popup.setY(event.getScreenY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
 				}
 				openTransition.stop();
 				closeTransition.stop();
@@ -291,9 +291,9 @@ public final class PopupHelper {
 				popups.add(popup);
 
 				if (!popup.isShowing()) {
-					popup.show(node, event.getSceneX(), event.getSceneY());
-					popup.setX(event.getSceneX() - popup.getWidth() / 2);
-					popup.setY(event.getSceneY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
+					popup.show(node, event.getScreenX(), event.getScreenY());
+					popup.setX(event.getScreenX() - popup.getWidth() / 2);
+					popup.setY(event.getScreenY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
 				}
 				openTransition.stop();
 				closeTransition.stop();
