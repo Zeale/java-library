@@ -60,6 +60,83 @@ public final class PopupHelper {
 		applyInfoPopup(node, popup, 400);
 	}
 
+	public static void applyInstantInfoPopup(Node node, Popup popup) {
+		final Parent popupRoot = popup.getScene().getRoot();
+		final FadeTransition openTransition = new FadeTransition(Duration.millis(350), popupRoot),
+				closeTransition = new FadeTransition(Duration.millis(350), popupRoot);
+		openTransition.setToValue(1);
+		closeTransition.setToValue(0);
+		popupRoot.setOpacity(0);
+
+		closeTransition.setOnFinished(event -> {
+			popup.hide();
+		});
+
+		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+
+		new Object() {
+
+			private byte eve;
+
+			{
+
+				// Without this, whenever the "open(MouseEvent)" method is called, it's called
+				// with the original mouse enter event that initiates it, even though the user
+				// might have moved the mouse in the delay after the mouse enter event is
+				// passed.
+
+				node.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+					open(event);
+					eve = 0;
+				});
+
+				node.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
+					eve = 1;
+					if (eve != 2)
+						close();
+				});
+
+				popupRoot.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+					if (eve == 1)
+						open(event);
+					eve = 2;
+				});
+
+				popupRoot.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
+					eve = 3;
+					if (eve != 0)
+						close();
+				});
+
+			}
+
+			private void close() {
+				openTransition.stop();
+				closeTransition.stop();
+				closeTransition.setFromValue(closeTransition.getNode().getOpacity());
+				closeTransition.play();
+			}
+
+			private void open(final MouseEvent event) {
+				if (node.getProperties().containsKey(LAST_POPUP_KEY)
+						&& node.getProperties().get(LAST_POPUP_KEY) != popup
+						&& ((Popup) node.getProperties().get(LAST_POPUP_KEY)).isShowing())
+					return;
+				node.getProperties().put(LAST_POPUP_KEY, popup);
+
+				if (!popup.isShowing()) {
+					popup.show(node, event.getScreenX(), event.getScreenY());
+					popup.setX(event.getScreenX() - popup.getWidth() / 2);
+					popup.setY(event.getScreenY() - popup.getHeight() - DEFAULT_POPUP_VERTICAL_DISPLACEMENT);
+				}
+				openTransition.stop();
+				closeTransition.stop();
+				openTransition.setFromValue(openTransition.getNode().getOpacity());
+				openTransition.play();
+			}
+		};
+	}
+
 	public static void applyInfoPopup(final Node node, final Popup popup, long hoverDelayMillis) {
 		final Parent popupRoot = popup.getScene().getRoot();
 		final FadeTransition openTransition = new FadeTransition(Duration.millis(350), popupRoot),
