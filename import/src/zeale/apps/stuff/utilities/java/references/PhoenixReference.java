@@ -23,6 +23,10 @@ public abstract class PhoenixReference<T> {
 		};
 	}
 
+	public boolean exists() {
+		return reference.get() != null;
+	}
+
 	public final T get() {
 		// #reference should always have a value.
 		T value = reference.get();
