@@ -80,20 +80,15 @@ public final class PopupHelper {
 
 			{
 
-				// Without this, whenever the "open(MouseEvent)" method is called, it's called
-				// with the original mouse enter event that initiates it, even though the user
-				// might have moved the mouse in the delay after the mouse enter event is
-				// passed.
-
 				node.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
 					open(event);
 					eve = 0;
 				});
 
 				node.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
-					eve = 1;
 					if (eve != 2)
 						close();
+					eve = 1;
 				});
 
 				popupRoot.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
@@ -103,9 +98,9 @@ public final class PopupHelper {
 				});
 
 				popupRoot.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
-					eve = 3;
 					if (eve != 0)
 						close();
+					eve = 3;
 				});
 
 			}
