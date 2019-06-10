@@ -8,11 +8,15 @@ import java.util.Scanner;
 
 public class Datamap extends HashMap<String, String> {
 
+	// 1. Values can contain "=", but keys cannot.
+	// 2. "//" is used for comments; lines that begin with this are skipped over.
+	// 3. Neither keys nor values can contain the line separator ("\n"), which is
+	// used for separating different pieces of data.
+
 	@Override
 	// TODO Trim output.
 	public String put(String key, String value) {
-		String lineSeparator = System.getProperty("line.separator");
-		if (key.contains("=") || key.contains(lineSeparator) || value.contains(lineSeparator))
+		if (key.contains("=") || key.contains("\n") || value.contains("\n"))
 			throw new IllegalArgumentException();
 		return super.put(key, value);
 	}
@@ -40,8 +44,27 @@ public class Datamap extends HashMap<String, String> {
 					continue;
 				else if (!line.contains("="))
 					throw new RuntimeException("Couldn't find a key value pair for a line.");
-				String[] strings = line.split("=");
-				String key = strings[0], value = strings[1];
+				int index = line.indexOf('=');
+				String key = line.substring(0, index), value = line.substring(index + 1);
+
+				map.put(key, value);
+			}
+		}
+
+		return map;
+	}
+
+	public static Datamap readLax(InputStream inputStream) {
+		Datamap map = new Datamap();
+		try (Scanner scanner = new Scanner(inputStream)) {
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.isEmpty() || line.startsWith("//"))
+					continue;
+				else if (!line.contains("="))
+					continue;
+				int index = line.indexOf('=');
+				String key = line.substring(0, index), value = line.substring(index + 1);
 
 				map.put(key, value);
 			}
