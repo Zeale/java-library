@@ -3,7 +3,7 @@ package zeale.apps.stuff.utilities.java.references;
 import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
-public abstract class PhoenixReference<T> {
+public abstract class PhoenixReference<T> implements Supplier<T> {
 
 	private WeakReference<T> reference;
 
@@ -17,7 +17,7 @@ public abstract class PhoenixReference<T> {
 		reference = new WeakReference<>(lazy ? null : generate());
 	}
 
-	public static <T> PhoenixReference<? super T> create(Supplier<? extends T> generator) {
+	public static <T> PhoenixReference<? extends T> create(Supplier<? extends T> generator) {
 		return new PhoenixReference<T>() {
 			@Override
 			protected T generate() {
@@ -26,7 +26,7 @@ public abstract class PhoenixReference<T> {
 		};
 	}
 
-	public static <T> PhoenixReference<? super T> create(boolean lazy, Supplier<? extends T> generator) {
+	public static <T> PhoenixReference<? extends T> create(boolean lazy, Supplier<? extends T> generator) {
 		return new PhoenixReference<T>(lazy) {
 
 			@Override
