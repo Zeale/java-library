@@ -17,7 +17,7 @@ public abstract class PhoenixReference<T> implements Supplier<T> {
 		reference = new WeakReference<>(lazy ? null : generate());
 	}
 
-	public static <T> PhoenixReference<? extends T> create(Supplier<? extends T> generator) {
+	public static <T> PhoenixReference<T> create(Supplier<? extends T> generator) {
 		return new PhoenixReference<T>() {
 			@Override
 			protected T generate() {
@@ -26,7 +26,7 @@ public abstract class PhoenixReference<T> implements Supplier<T> {
 		};
 	}
 
-	public static <T> PhoenixReference<? extends T> create(boolean lazy, Supplier<? extends T> generator) {
+	public static <T> PhoenixReference<T> create(boolean lazy, Supplier<? extends T> generator) {
 		return new PhoenixReference<T>(lazy) {
 
 			@Override
