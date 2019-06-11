@@ -21,7 +21,7 @@ public abstract class SporadicPhoenixReference<T> {
 
 	}
 
-	public static <T> SporadicPhoenixReference<? super T> create(Supplier<? extends T> generator) {
+	public static <T> SporadicPhoenixReference<T> create(Supplier<? extends T> generator) {
 		return new SporadicPhoenixReference<T>() {
 			@Override
 			protected T generate() {
@@ -30,7 +30,7 @@ public abstract class SporadicPhoenixReference<T> {
 		};
 	}
 
-	public static <T> SporadicPhoenixReference<? super T> create(boolean lazy, Supplier<? extends T> generator) {
+	public static <T> SporadicPhoenixReference<T> create(boolean lazy, Supplier<? extends T> generator) {
 		return new SporadicPhoenixReference<T>(lazy) {
 
 			@Override
@@ -40,7 +40,7 @@ public abstract class SporadicPhoenixReference<T> {
 		};
 	}
 	
-	public static <T> SporadicPhoenixReference<? super T> create(Callable<? extends T> generator) {
+	public static <T> SporadicPhoenixReference<T> create(Callable<? extends T> generator) {
 		return new SporadicPhoenixReference<T>() {
 			@Override
 			protected T generate() throws Exception {
@@ -49,7 +49,7 @@ public abstract class SporadicPhoenixReference<T> {
 		};
 	}
 
-	public static <T> SporadicPhoenixReference<? super T> create(boolean lazy, Callable<? extends T> generator) {
+	public static <T> SporadicPhoenixReference<T> create(boolean lazy, Callable<? extends T> generator) {
 		return new SporadicPhoenixReference<T>(lazy) {
 
 			@Override
