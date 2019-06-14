@@ -34,9 +34,34 @@ public class Datamap extends HashMap<String, String> {
 
 	// TODO Trim read input.
 	public static Datamap read(InputStream inputStream) {
-
 		Datamap map = new Datamap();
+		map.update(inputStream);
+		return map;
+	}
 
+	public static Datamap readLax(InputStream inputStream) {
+		Datamap map = new Datamap();
+		map.updateLax(inputStream);
+		return map;
+	}
+
+	public void updateLax(InputStream inputStream) {
+		try (Scanner scanner = new Scanner(inputStream)) {
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.isEmpty() || line.startsWith("//"))
+					continue;
+				else if (!line.contains("="))
+					continue;
+				int index = line.indexOf('=');
+				String key = line.substring(0, index), value = line.substring(index + 1);
+
+				put(key, value);
+			}
+		}
+	}
+
+	public void update(InputStream inputStream) {
 		try (Scanner scanner = new Scanner(inputStream)) {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
@@ -47,30 +72,9 @@ public class Datamap extends HashMap<String, String> {
 				int index = line.indexOf('=');
 				String key = line.substring(0, index), value = line.substring(index + 1);
 
-				map.put(key, value);
+				put(key, value);
 			}
 		}
-
-		return map;
-	}
-
-	public static Datamap readLax(InputStream inputStream) {
-		Datamap map = new Datamap();
-		try (Scanner scanner = new Scanner(inputStream)) {
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				if (line.isEmpty() || line.startsWith("//"))
-					continue;
-				else if (!line.contains("="))
-					continue;
-				int index = line.indexOf('=');
-				String key = line.substring(0, index), value = line.substring(index + 1);
-
-				map.put(key, value);
-			}
-		}
-
-		return map;
 	}
 
 }
