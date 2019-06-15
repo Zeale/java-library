@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 public abstract class SporadicPhoenixReference<T> {
-	private WeakReference<T> reference;
+	protected WeakReference<T> reference;
 
 	protected abstract T generate() throws Exception;
 
@@ -39,7 +39,7 @@ public abstract class SporadicPhoenixReference<T> {
 			}
 		};
 	}
-	
+
 	public static <T> SporadicPhoenixReference<T> create(Callable<? extends T> generator) {
 		return new SporadicPhoenixReference<T>() {
 			@Override
@@ -84,6 +84,10 @@ public abstract class SporadicPhoenixReference<T> {
 			return newValue;
 		} else
 			return value;
+	}
+
+	public void regenerate() throws Exception {
+		reference = new WeakReference<>(generate());
 	}
 
 }

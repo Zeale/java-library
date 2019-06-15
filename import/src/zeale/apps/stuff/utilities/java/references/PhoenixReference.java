@@ -1,11 +1,10 @@
 package zeale.apps.stuff.utilities.java.references;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-public abstract class PhoenixReference<T> implements Supplier<T> {
-
-	private WeakReference<T> reference;
+public abstract class PhoenixReference<T> extends SporadicPhoenixReference<T> implements Supplier<T> {
 
 	protected abstract T generate();
 
@@ -14,7 +13,7 @@ public abstract class PhoenixReference<T> implements Supplier<T> {
 	}
 
 	public PhoenixReference(boolean lazy) {
-		reference = new WeakReference<>(lazy ? null : generate());
+		super(lazy);
 	}
 
 	public static <T> PhoenixReference<T> create(Supplier<? extends T> generator) {
@@ -36,10 +35,6 @@ public abstract class PhoenixReference<T> implements Supplier<T> {
 		};
 	}
 
-	public boolean exists() {
-		return reference.get() != null;
-	}
-
 	public final T get() {
 		// #reference should always have a value.
 		T value = reference.get();
@@ -49,6 +44,10 @@ public abstract class PhoenixReference<T> implements Supplier<T> {
 			return newValue;
 		} else
 			return value;
+	}
+
+	public void regenerate() {
+		reference = new WeakReference<>(generate());
 	}
 
 }
