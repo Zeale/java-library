@@ -20,7 +20,7 @@ import javafx.collections.ObservableList;
  *         find, is similar to (or the same as) that of {@link ContentBinding}.
  *
  */
-final class BindingConversion {
+public final class BindingConversion {
 
 	private static final class ListBinder<F, T> implements ListChangeListener<F>, WeakListener {
 
