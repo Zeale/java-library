@@ -49,8 +49,6 @@ public class Datamap extends HashMap<String, String> {
 		key = escape(key, '=');
 		key = escapeImpl(key, '\n');
 		value = escapeImpl(value, '\n');
-		if (key.contains("=") || key.contains("\n") || value.contains("\n"))
-			throw new IllegalArgumentException();
 		return super.put(key, value);
 	}
 
@@ -60,9 +58,12 @@ public class Datamap extends HashMap<String, String> {
 	private static final long serialVersionUID = 1L;
 
 	public static void save(Datamap datamap, OutputStream output) {
-		PrintWriter writer = new PrintWriter(output);
-		for (Entry<String, String> e : datamap.entrySet())
-			writer.print(e.getKey() + '=' + e.getValue() + '\n');
+		try (PrintWriter writer = new PrintWriter(output)) {
+			for (Entry<String, String> e : datamap.entrySet())
+				writer.print(e.getKey() + '=' + e.getValue() + '\n');
+			writer.flush();
+		}
+
 	}
 
 	// TODO Trim read input.
