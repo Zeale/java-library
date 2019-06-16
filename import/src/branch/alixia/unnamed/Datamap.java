@@ -62,7 +62,7 @@ public class Datamap extends HashMap<String, String> {
 	public static void save(Datamap datamap, OutputStream output) {
 		PrintWriter writer = new PrintWriter(output);
 		for (Entry<String, String> e : datamap.entrySet())
-			writer.println(e.getKey() + "=" + e.getValue());
+			writer.print(e.getKey() + '=' + e.getValue() + '\n');
 	}
 
 	// TODO Trim read input.
