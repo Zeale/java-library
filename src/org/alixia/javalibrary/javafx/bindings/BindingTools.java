@@ -1,10 +1,14 @@
 package org.alixia.javalibrary.javafx.bindings;
 
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.alixia.javalibrary.util.Gateway;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
@@ -47,6 +51,68 @@ public final class BindingTools {
 		return new PipewayBinding<F, T, X1, X2>(from, to, gateway);
 	}
 
+	public static <F, T, X1 extends ObservableValue<? extends F> & WritableValue<? super F>, X2 extends ObservableValue<? extends T> & WritableValue<? super T>> PipewayBinding<F, T, X1, X2> bibindDbg(
+			X1 from, Gateway<F, T> gateway, X2 to) {
+		return new PipewayBinding<F, T, X1, X2>(from, to, gateway, a -> a.printStackTrace());
+	}
+
+	public static <F, T> ObservableValue<T> mask(ObservableValue<F> prop, Function<? super F, ? extends T> converter) {
+		return new ObservableValue<T>() {
+
+			private ObservableValue<T> val = this;
+
+			class IncrementetiveChangeListener implements ChangeListener<F> {
+
+				private int count;
+
+				private final ChangeListener<? super T> backing;
+
+				public IncrementetiveChangeListener(ChangeListener<? super T> backing) {
+					this.backing = backing;
+				}
+
+				@Override
+				public void changed(ObservableValue<? extends F> observable, F oldValue, F newValue) {
+					for (int i = 0; i < count; i++)
+						backing.changed(val, converter.apply(oldValue), converter.apply(newValue));
+				}
+
+			}
+
+			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new WeakHashMap<>();
+
+			@Override
+			public void addListener(InvalidationListener listener) {
+				prop.addListener(listener);
+			}
+
+			@Override
+			public void removeListener(InvalidationListener listener) {
+				prop.removeListener(listener);
+			}
+
+			@Override
+			public void addListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					listeners.get(listener).count++;
+				else
+					listeners.put(listener, new IncrementetiveChangeListener(listener));
+			}
+
+			@Override
+			public void removeListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					if (listeners.get(listener).count-- < 0)
+						listeners.remove(listener);
+			}
+
+			@Override
+			public T getValue() {
+				return converter.apply(prop.getValue());
+			}
+		};
+	}
+
 	public static final class PipewayBinding<F, T, X1 extends ObservableValue<? extends F> & WritableValue<? super F>, X2 extends ObservableValue<? extends T> & WritableValue<? super T>> {
 		private final WeakReference<X1> from;
 		private final WeakReference<X2> to;
@@ -71,6 +137,7 @@ public final class BindingTools {
 						try {
 							val = converter.from(newValue);
 						} catch (RuntimeException e) {
+							errHandler.accept(e);
 							return;
 						}
 						t.setValue(val);
@@ -98,6 +165,7 @@ public final class BindingTools {
 						try {
 							val = converter.to(newValue);
 						} catch (RuntimeException e) {
+							errHandler.accept(e);
 							return;
 						}
 						f.setValue(val);
@@ -117,11 +185,20 @@ public final class BindingTools {
 		}
 
 		public PipewayBinding(X1 prop1, X2 prop2, Gateway<F, T> converter) {
+			this(prop1, prop2, converter, a -> {
+			});
+		}
+
+		private final Consumer<? super RuntimeException> errHandler;
+
+		public PipewayBinding(X1 prop1, X2 prop2, Gateway<F, T> converter,
+				Consumer<? super RuntimeException> errHandler) {
 			this.from = new WeakReference<>(prop1);
 			this.to = new WeakReference<>(prop2);
 			this.converter = converter;
 			prop1.addListener(fromListener);
 			prop2.addListener(toListener);
+			this.errHandler = errHandler;
 		}
 
 	}
