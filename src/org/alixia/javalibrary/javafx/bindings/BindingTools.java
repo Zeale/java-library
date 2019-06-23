@@ -1,11 +1,16 @@
 package org.alixia.javalibrary.javafx.bindings;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.alixia.chatroom.api.QuickList;
 import org.alixia.javalibrary.util.Gateway;
 
 import javafx.beans.InvalidationListener;
@@ -14,6 +19,9 @@ import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 public final class BindingTools {
 	private BindingTools() {
@@ -199,6 +207,119 @@ public final class BindingTools {
 			prop1.addListener(fromListener);
 			prop2.addListener(toListener);
 			this.errHandler = errHandler;
+		}
+
+	}
+
+	/**
+	 * Creates a filtered binding between the two given {@link List}s. Each change
+	 * in the <code>container</code> list is applied through each given
+	 * <code>filter</code>. If any filter returns <code>false</code> when given the
+	 * item involved in a change, the change is ignored (i.e. the
+	 * <code>boundContainer</code> is not affected by the change observed in the
+	 * container). If the change is an addition, each filter must return
+	 * <code>true</code> when given the object being added for the addition to be
+	 * reflected in the <code>boundContainer</code>. If the change is a removal,
+	 * each filter must still return <code>true</code> for the removal to be
+	 * reflected in the <code>boundContainer</code>. Changes are observed happening
+	 * in the <code>container</code> and are reflected (if the filters allow) in the
+	 * <code>boundContainer</code>.
+	 * 
+	 * @param <T>            The type of the content of the bound list.
+	 * @param container      The {@link List} to observe.
+	 * @param boundContainer The {@link List} to apply observed changes that
+	 *                       successfully pass through the filters, to.
+	 * @param filters        The filters that allow a change to be propagated to the
+	 *                       bound list.
+	 * @return A {@link FilterBinding} object which can be used to modify the
+	 *         filters involved in the binding or to unbind/rebind the lists at
+	 *         will.
+	 */
+	@SafeVarargs
+	public static <T> FilterBinding<T> filterBind(ObservableList<? extends T> container, List<T> boundContainer,
+			Function<T, Boolean>... filters) {
+		return new FilterBinding<>(container, boundContainer, filters);
+	}
+
+	public static final class FilterBinding<T> {
+
+		private final ObservableList<? extends T> container;
+		private final List<T> glass;
+		private final Collection<Function<? super T, Boolean>> filters;
+		private final ListChangeListener<T> listener;
+
+		public synchronized void addFilter(Function<? super T, Boolean> filter) {
+			filters.add(filter);
+			for (Iterator<T> iterator = glass.iterator(); iterator.hasNext();)
+				if (!filter.apply(iterator.next()))
+					iterator.remove();
+		}
+
+		public synchronized void removeFilter(Function<? super T, Boolean> filter) {
+			filters.remove(filter);
+
+			NEXT_ITEM: for (T t : container)
+				if (!filter.apply(t))
+					for (Function<? super T, Boolean> f : filters) {
+						if (!f.apply(t))
+							continue NEXT_ITEM;
+						glass.add(t);
+					}
+		}
+
+		@SafeVarargs
+		public FilterBinding(ObservableList<? extends T> container, List<T> glass,
+				Function<? super T, Boolean>... filters) {
+			this.glass = glass;
+			this.filters = new QuickList<Function<? super T, Boolean>>(filters);
+			synchronized (this) {
+				glass.clear();
+				N: for (T t : container) {
+					for (Function<? super T, Boolean> f : filters)
+						if (!f.apply(t))
+							continue N;
+					glass.add(t);
+				}
+				(this.container = container).addListener(listener = (ListChangeListener<T>) c -> {
+					while (c.next())
+						if (c.wasAdded())
+							NEXT_ITEM: for (T t1 : c.getAddedSubList())
+								synchronized (this) {
+									for (Function<? super T, Boolean> f1 : this.filters)
+										if (!f1.apply(t1))
+											continue NEXT_ITEM;
+									glass.add(t1);
+								}
+						else if (c.wasRemoved())
+							NEXT_ITEM: for (T t2 : c.getRemoved())
+								synchronized (this) {
+//									if (FilterBinding.this.filters.size() < glass.size()) {
+									for (Function<? super T, Boolean> f2 : this.filters) {
+										if (!f2.apply(t2))
+											continue NEXT_ITEM;
+										glass.remove(t2);
+									}
+//									} else
+//										glass.remove(t);
+								}
+				});
+			}
+
+		}
+
+		public synchronized void unbind() {
+			container.removeListener(listener);
+		}
+
+		public synchronized void bind() {
+			glass.clear();
+			N: for (T t : container) {
+				for (Function<? super T, Boolean> f : filters)
+					if (!f.apply(t))
+						continue N;
+				glass.add(t);
+			}
+			container.addListener(listener);
 		}
 
 	}
