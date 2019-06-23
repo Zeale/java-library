@@ -252,12 +252,12 @@ public final class BindingTools {
 			filters.remove(filter);
 
 			NEXT_ITEM: for (T t : container)
-				if (!filter.apply(t))
-					for (Function<? super T, Boolean> f : filters) {
+				if (!filter.apply(t)) {
+					for (Function<? super T, Boolean> f : filters)
 						if (!f.apply(t))
 							continue NEXT_ITEM;
-						glass.add(t);
-					}
+					glass.add(t);
+				}
 		}
 
 		@SafeVarargs
