@@ -3,7 +3,6 @@ package org.alixia.javalibrary.javafx.bindings;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -19,7 +18,6 @@ import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
@@ -57,11 +55,6 @@ public final class BindingTools {
 	public static <F, T, X1 extends ObservableValue<? extends F> & WritableValue<? super F>, X2 extends ObservableValue<? extends T> & WritableValue<? super T>> PipewayBinding<F, T, X1, X2> bindBidirectional(
 			X1 from, Gateway<F, T> gateway, X2 to) {
 		return new PipewayBinding<F, T, X1, X2>(from, to, gateway);
-	}
-
-	public static <F, T, X1 extends ObservableValue<? extends F> & WritableValue<? super F>, X2 extends ObservableValue<? extends T> & WritableValue<? super T>> PipewayBinding<F, T, X1, X2> bibindDbg(
-			X1 from, Gateway<F, T> gateway, X2 to) {
-		return new PipewayBinding<F, T, X1, X2>(from, to, gateway, a -> a.printStackTrace());
 	}
 
 	public static <F, T> ObservableValue<T> mask(ObservableValue<F> prop, Function<? super F, ? extends T> converter) {
