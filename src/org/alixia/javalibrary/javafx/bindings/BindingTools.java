@@ -136,7 +136,7 @@ public final class BindingTools {
 						updating = true;
 						T val;
 						try {
-							val = converter.from(newValue);
+							val = converter.to(newValue);
 						} catch (RuntimeException e) {
 							errHandler.accept(e);
 							return;
@@ -164,7 +164,7 @@ public final class BindingTools {
 						updating = true;
 						F val;
 						try {
-							val = converter.to(newValue);
+							val = converter.from(newValue);
 						} catch (RuntimeException e) {
 							errHandler.accept(e);
 							return;

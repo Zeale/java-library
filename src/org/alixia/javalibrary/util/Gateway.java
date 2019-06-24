@@ -1,7 +1,17 @@
 package org.alixia.javalibrary.util;
 
-public interface Gateway<F, T> {
-	T from(F value);
+import java.util.function.Function;
 
-	F to(T value);
+public interface Gateway<F, T> {
+	T to(F value);
+
+	F from(T value);
+
+	default Function<F, T> from() {
+		return this::to;
+	}
+
+	default Function<T, F> to() {
+		return this::from;
+	}
 }
