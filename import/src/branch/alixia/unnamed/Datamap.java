@@ -9,6 +9,10 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Function;
+
+import org.alixia.javalibrary.util.Gateway;
+import org.alixia.javalibrary.util.StringGateway;
 
 public class Datamap extends HashMap<String, String> {
 
@@ -31,7 +35,27 @@ public class Datamap extends HashMap<String, String> {
 				writer.print(escapeKey(e.getKey()) + '=' + escapeValue(e.getValue()) + '\n');
 			writer.flush();
 		}
+	}
 
+	public static void main(String[] args) {
+		Gateway<String, Double> converter = (StringGateway<Double>) value -> Double.valueOf(value);
+		Datamap map = new Datamap();
+	}
+
+	public <T> String put(String key, Gateway<? super T, ? extends String> converter, T value) {
+		return put(key, converter.from(), value);
+	}
+
+	public <T> T get(String key, Gateway<? extends T, ? super String> converter) {
+		return get(key, converter.to());
+	}
+
+	public <T> String put(String key, Function<? super T, ? extends String> converter, T value) {
+		return put(key, converter.apply(value));
+	}
+
+	public <T> T get(String key, Function<? super String, ? extends T> converter) {
+		return converter.apply(get(key));
 	}
 
 	// TODO Trim read input.
