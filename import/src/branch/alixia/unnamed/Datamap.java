@@ -7,49 +7,17 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Datamap extends HashMap<String, String> {
 
-	private static String escapeBackslashes(String string) {
-		return escapeImpl(string, '\\');
+	private static String escapeKey(String key) {
+		return key.replace((CharSequence) "\\", "\\\\").replace("\n", "\\\n").replace("=", "\\=");
 	}
 
-	private static String escape(String string, char esc) {
-		return escapeImpl(escapeBackslashes(string), esc);
-	}
-
-	private static String escapeImpl(String string, String esc) {
-		int ind = string.indexOf(esc);
-		if (ind != -1) {
-			int prev = 0;
-			do {
-				string = string.substring(0, ind) + "\\" + string.substring(prev = ind);
-				ind = string.indexOf(esc, prev + esc.length() + 1);
-			} while (ind != -1);
-		}
-		return string;
-	}
-
-	private static String escapeImpl(String string, char esc) {
-		int ind = string.indexOf(esc);
-		if (ind != -1) {
-			int prev = 0;
-			do {
-				string = string.substring(0, ind) + "\\" + string.substring(prev = ind);
-				ind = string.indexOf(esc, prev + 2);
-			} while (ind != -1);
-		}
-		return string;
-	}
-
-	@Override
-	// TODO Trim output.
-	public String put(String key, String value) {
-		key = escape(key, '=');
-		key = escapeImpl(key, '\n');
-		value = escapeImpl(value, '\n');
-		return super.put(key, value);
+	private static String escapeValue(String value) {
+		return value.replace("\\", "\\\\").replace("\n", "\\\n");
 	}
 
 	/**
@@ -59,8 +27,8 @@ public class Datamap extends HashMap<String, String> {
 
 	public static void save(Datamap datamap, OutputStream output) {
 		try (PrintWriter writer = new PrintWriter(output)) {
-			for (Entry<String, String> e : datamap.entrySet())
-				writer.print(e.getKey() + '=' + e.getValue() + '\n');
+			for (Map.Entry<String, String> e : datamap.entrySet())
+				writer.print(escapeKey(e.getKey()) + '=' + escapeValue(e.getValue()) + '\n');
 			writer.flush();
 		}
 
@@ -91,17 +59,17 @@ public class Datamap extends HashMap<String, String> {
 					// Or we just, actually reached the end of the file. Either way...
 
 					char c = (char) x;
-					if (c == '\\') {
+					if (c == '\\')
 						if (escaped)
 							key += '\\';
 						else
 							escaped = true;
-					} else if (c == '=') {
+					else if (c == '=')
 						if (escaped)
 							key += '=';
 						else
 							break;// Move on to parsing the value
-					} else if (c == '\n')
+					else if (c == '\n')
 						if (escaped)
 							key += '\n';
 						else
@@ -133,8 +101,7 @@ public class Datamap extends HashMap<String, String> {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -192,8 +159,13 @@ public class Datamap extends HashMap<String, String> {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static class UpdateException extends RuntimeException {
+		private UpdateException(Throwable cause) {
+			super(cause);
 		}
 	}
 
