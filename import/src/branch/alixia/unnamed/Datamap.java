@@ -8,21 +8,23 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.function.Function;
 
 import org.alixia.javalibrary.util.Gateway;
+import org.alixia.javalibrary.util.Pair;
 import org.alixia.javalibrary.util.StringGateway;
 
 public class Datamap extends HashMap<String, String> {
 
-	private static String escapeKey(String key) {
+	protected String escapeKey(String key) {
 		return key.replace((CharSequence) "\\", "\\\\").replace("\n", "\\\n").replace("=", "\\=");
 	}
 
-	private static String escapeValue(String value) {
+	protected String escapeValue(String value) {
 		return value.replace("\\", "\\\\").replace("\n", "\\\n");
 	}
+
+	protected String splitter = "=", nextPair = "\n";
 
 	/**
 	 * SUID
@@ -30,16 +32,22 @@ public class Datamap extends HashMap<String, String> {
 	private static final long serialVersionUID = 1L;
 
 	public static void save(Datamap datamap, OutputStream output) {
+		datamap.save(output);
+	}
+
+	public void save(OutputStream output) {
 		try (PrintWriter writer = new PrintWriter(output)) {
-			for (Map.Entry<String, String> e : datamap.entrySet())
-				writer.print(escapeKey(e.getKey()) + '=' + escapeValue(e.getValue()) + '\n');
-			writer.flush();
+			write(writer);
 		}
 	}
 
-	public static void main(String[] args) {
-		Gateway<String, Double> converter = (StringGateway<Double>) value -> Double.valueOf(value);
-		Datamap map = new Datamap();
+	protected void write(PrintWriter writer) {
+		for (Map.Entry<String, String> e : entrySet())
+			write(writer, e.getKey(), e.getValue());
+	}
+
+	protected void write(PrintWriter writer, String key, String value) {
+		writer.print(escapeKey(key) + splitter + escapeValue(value) + nextPair);
 	}
 
 	public <T> String put(String key, Gateway<? super T, ? extends String> converter, T value) {
