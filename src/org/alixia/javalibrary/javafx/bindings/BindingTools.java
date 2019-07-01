@@ -325,7 +325,7 @@ public final class BindingTools {
 		return new ObservableListView<>(view);
 	}
 
-	public static <F, T> ObservableListView<T> view(ObservableListView<F> view, Function<F, T> converter) {
+	public static <F, T> ObservableListView<T> view(ObservableListView<? extends F> view, Function<F, T> converter) {
 		return new ObservableListView<T>() {
 			{
 				view.addListener(new ListListener<F>() {
@@ -345,6 +345,77 @@ public final class BindingTools {
 						for (F f : items)
 							list.add(converter.apply(f));
 						propRem(list, startpos);
+					}
+				});
+			}
+		};
+	}
+
+	public interface Unbindable {
+		void unbind();
+	}
+
+	public static <T> Unbindable bind(Collection<? super T> list, ObservableListView<? extends T> view) {
+		ListListener<T> listener = new ListListener<T>() {
+
+			@Override
+			public void added(List<? extends T> items, int startpos) {
+				list.addAll(items);
+			}
+
+			@Override
+			public void removed(List<? extends T> items, int startpos) {
+				for (T t : items)
+					list.remove(t);
+			}
+		};
+		view.addListener(listener);
+		return () -> view.removeListener(listener);
+	}
+
+	/**
+	 * Returns an {@link ObservableListView} which propagates the changes in the
+	 * specified {@link ObservableListView} that pass the given filters. <b>Changes
+	 * propagated past this filter will be be broken, in terms of position. I.e.,
+	 * the positions of changes propagated from this view should not be expected to
+	 * be accurate.</b>
+	 * 
+	 * @param <T>     The type of the object of the list that gets changed.
+	 * @param view    The view to filter changes from.
+	 * @param filters The filters.
+	 * @return A new {@link ObservableListView}.
+	 */
+	@SafeVarargs
+	public static <T> ObservableListView<T> filter(ObservableListView<? extends T> view,
+			Function<? super T, Boolean>... filters) {
+		return new ObservableListView<T>() {
+			{
+				view.addListener(new ListListener<T>() {
+
+					@Override
+					public void added(List<? extends T> items, int startpos) {
+						List<T> prop = new ArrayList<>(items.size());
+						NEXT_ITEM: for (T t : items) {
+							for (Function<? super T, Boolean> f : filters)
+								if (!f.apply(t))
+									continue NEXT_ITEM;
+							prop.add(t);
+						}
+
+						propAdd(prop, -1);
+					}
+
+					@Override
+					public void removed(List<? extends T> items, int startpos) {
+						List<T> prop = new ArrayList<>(items.size());
+						NEXT_ITEM: for (T t : items) {
+							for (Function<? super T, Boolean> f : filters)
+								if (!f.apply(t))
+									continue NEXT_ITEM;
+							prop.add(t);
+						}
+
+						propRem(prop, -1);
 					}
 				});
 			}
