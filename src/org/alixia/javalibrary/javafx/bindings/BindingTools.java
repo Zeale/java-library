@@ -287,11 +287,10 @@ public final class BindingTools {
 							NEXT_ITEM: for (T t2 : c.getRemoved())
 								synchronized (this) {
 //									if (FilterBinding.this.filters.size() < glass.size()) {
-									for (Function<? super T, Boolean> f2 : this.filters) {
+									for (Function<? super T, Boolean> f2 : this.filters)
 										if (!f2.apply(t2))
 											continue NEXT_ITEM;
-										glass.remove(t2);
-									}
+									glass.remove(t2);
 //									} else
 //										glass.remove(t);
 								}
