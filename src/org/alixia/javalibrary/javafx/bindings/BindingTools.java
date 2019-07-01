@@ -1,6 +1,7 @@
 package org.alixia.javalibrary.javafx.bindings;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -314,6 +315,40 @@ public final class BindingTools {
 			container.addListener(listener);
 		}
 
+	}
+
+	public static <T> ObservableListView<T> view(ObservableList<? extends T> list) {
+		return new ObservableListView<>(list);
+	}
+
+	public static <T> ObservableListView<T> view(ObservableListView<T> view) {
+		return new ObservableListView<>(view);
+	}
+
+	public static <F, T> ObservableListView<T> view(ObservableListView<F> view, Function<F, T> converter) {
+		return new ObservableListView<T>() {
+			{
+				view.addListener(new ListListener<F>() {
+
+					@Override
+					public void added(List<? extends F> items, int startpos) {
+						List<T> list = new ArrayList<>(items.size());
+						for (F f : items)
+							list.add(converter.apply(f));
+						propAdd(list, startpos);
+
+					}
+
+					@Override
+					public void removed(List<? extends F> items, int startpos) {
+						List<T> list = new ArrayList<>(items.size());
+						for (F f : items)
+							list.add(converter.apply(f));
+						propRem(list, startpos);
+					}
+				});
+			}
+		};
 	}
 
 }
