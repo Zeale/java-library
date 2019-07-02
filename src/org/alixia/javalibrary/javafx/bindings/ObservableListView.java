@@ -3,34 +3,16 @@ package org.alixia.javalibrary.javafx.bindings;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-public class ObservableListView<T> {
+public class ObservableListView<T> implements ListListener<T> {
 
 	public ObservableListView(ObservableList<? extends T> list) {
-		list.addListener((ListChangeListener<T>) c -> {
-			while (c.next())
-				if (c.wasAdded())
-					propAdd(c.getAddedSubList(), c.getFrom());
-				else if (c.wasRemoved())
-					propRem(c.getRemoved(), c.getFrom());
-		});
+		list.addListener(this);
 	}
 
 	public ObservableListView(ObservableListView<? extends T> view) {
-		view.addListener(new ListListener<T>() {
-
-			@Override
-			public void added(List<? extends T> items, int startpos) {
-				propAdd(items, startpos);
-			}
-
-			@Override
-			public void removed(List<? extends T> items, int startpos) {
-				propRem(items, startpos);
-			}
-		});
+		view.addListener(this);
 	}
 
 	protected final void propAdd(List<? extends T> items, int startpos) {
@@ -58,6 +40,16 @@ public class ObservableListView<T> {
 
 	public void removeListener(ListListener<? super T> listener) {
 		listeners.remove(listener);
+	}
+
+	@Override
+	public void added(List<? extends T> items, int startpos) {
+		propAdd(items, startpos);
+	}
+
+	@Override
+	public void removed(List<? extends T> items, int startpos) {
+		propRem(items, startpos);
 	}
 
 }
