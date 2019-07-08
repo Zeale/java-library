@@ -94,8 +94,10 @@ public class Datamap extends HashMap<String, String> {
 					if (c == '\\')
 						if (escaped)
 							key += '\\';
-						else
+						else {
 							escaped = true;
+							continue;
+						}
 					else if (c == '=')
 						if (escaped)
 							key += '=';
@@ -111,6 +113,7 @@ public class Datamap extends HashMap<String, String> {
 							continue NEXT_KEY;
 					else
 						key += c;
+					escaped = false;
 				}
 
 				String value = "";
@@ -119,7 +122,14 @@ public class Datamap extends HashMap<String, String> {
 					if (x == -1) {
 						put(key, value);
 						return;
-					} else if (x == '\n') {
+					} else if (x == '\\')
+						if (escaped)
+							value += '\\';
+						else {
+							escaped = true;
+							continue;
+						}
+					else if (x == '\n') {
 						if (escaped)
 							value += '\n';
 						else {
@@ -128,6 +138,7 @@ public class Datamap extends HashMap<String, String> {
 						}
 					} else
 						value += (char) x;
+					escaped = false;
 				}
 
 			}
@@ -154,8 +165,10 @@ public class Datamap extends HashMap<String, String> {
 					if (c == '\\')
 						if (escaped)
 							key += '\\';
-						else
+						else {
 							escaped = true;
+							continue;
+						}
 					else if (c == '=')
 						if (escaped)
 							key += '=';
@@ -169,6 +182,7 @@ public class Datamap extends HashMap<String, String> {
 							throw new RuntimeException("Found a key with no value.");
 					else
 						key += c;
+					escaped = false;
 				}
 
 				String value = "";
@@ -177,7 +191,14 @@ public class Datamap extends HashMap<String, String> {
 					if (x == -1) {
 						put(key, value);
 						return;
-					} else if (x == '\n')
+					} else if (x == '\\')
+						if (escaped)
+							value += '\\';
+						else {
+							escaped = true;
+							continue;
+						}
+					else if (x == '\n')
 						if (escaped)
 							value += '\n';
 						else {
@@ -186,6 +207,7 @@ public class Datamap extends HashMap<String, String> {
 						}
 					else
 						value += (char) x;
+					escaped = false;
 				}
 
 			}
