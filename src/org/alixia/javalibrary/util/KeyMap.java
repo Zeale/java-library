@@ -60,4 +60,10 @@ public class KeyMap<V> implements Serializable {
 		}
 	}
 
+	public class OptionalKey<KV extends V> extends Key<KV> {
+		public boolean exists() {
+			return data.containsKey(this);
+		}
+	}
+
 }
