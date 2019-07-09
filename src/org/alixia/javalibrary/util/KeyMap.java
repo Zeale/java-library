@@ -80,6 +80,20 @@ public class KeyMap<V, M extends Map<KeyMap.Key<?>, V>> implements Serializable 
 		return new LocalKey<>(key);
 	}
 
+	/**
+	 * A convenience method to create a {@link LocalKey} and assign a value to it.
+	 * 
+	 * @param <KV>  The type of the value of the key.
+	 * @param key   The {@link Key} object to back this {@link LocalKey}.
+	 * @param value The value to assign to this map with the specified key.
+	 * @return The new {@link LocalKey}.
+	 */
+	public <KV extends V> LocalKey<KV> lk(Key<KV> key, KV value) {
+		LocalKey<KV> lk = lk(key);
+		key.put(this, value);
+		return lk;
+	}
+
 	public <KV extends V> LocalKey<KV> lk() {
 		return lk(new Key<>());
 	}
