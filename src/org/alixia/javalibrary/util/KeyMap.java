@@ -1,16 +1,29 @@
 package org.alixia.javalibrary.util;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.WeakHashMap;
 
-public class KeyMap<V> implements Serializable {
+public class KeyMap<V, M extends Map<KeyMap.Key<?>, V>> implements Serializable {
 
 	/**
 	 * SUID
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final WeakHashMap<Key<?>, V> data = new WeakHashMap<>();
+	private final M data;
+
+	protected KeyMap(M map) {
+		this.data = map;
+	}
+
+	public static <V, M extends Map<Key<?>, V>> KeyMap<V, M> keyMap(M map) {
+		return new KeyMap<>(map);
+	}
+
+	public static <V> KeyMap<V, WeakHashMap<KeyMap.Key<?>, V>> keyMap() {
+		return new KeyMap<>(new WeakHashMap<>());
+	}
 
 	/**
 	 * Returns the {@link WeakHashMap} that backs this {@link KeyMap}. Care should
@@ -21,7 +34,7 @@ public class KeyMap<V> implements Serializable {
 	 * 
 	 * @return The {@link WeakHashMap} that backs this {@link KeyMap}.
 	 */
-	public WeakHashMap<Key<?>, V> getData() {
+	public M getData() {
 		return data;
 	}
 
@@ -75,17 +88,17 @@ public class KeyMap<V> implements Serializable {
 		private Key() {
 		}
 
-		public KV get(KeyMap<? super KV> map) {
+		public KV get(KeyMap<? super KV, ?> map) {
 			return map.get(this);
 		}
 
-		public KV put(KeyMap<? super KV> map, KV data) {
+		public KV put(KeyMap<? super KV, ?> map, KV data) {
 			return map.put(this, data);
 		}
 	}
 
 	public static class OptionalKey<KV> extends Key<KV> {
-		public boolean exists(KeyMap<?> map) {
+		public boolean exists(KeyMap<?, ?> map) {
 			return map.containsKey(this);
 		}
 	}
