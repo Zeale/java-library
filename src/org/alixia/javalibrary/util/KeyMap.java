@@ -39,31 +39,73 @@ public class KeyMap<V> implements Serializable {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T extends V> T put(Key<T> key, T data) {
+		return (T) this.data.put(key, data);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends V> T get(Key<T> key) {
+		return (T) data.get(key);
+	}
+
+	public boolean containsKey(Key<?> key) {
+		return data.containsKey(key);
+	}
+
 	public <T extends V> Key<T> put(T data) {
-		Key<T> key = new Key<>();
-		key.put(data);
+		Key<T> key = key();
+		put(key, data);
 		return key;
 	}
 
-	public class Key<KV extends V> {
+	protected static <V> Key<V> key() {
+		return new Key<>();
+	}
+
+	public <KV extends V> LocalKey<KV> lk(Key<KV> key) {
+		return new LocalKey<>(key);
+	}
+
+	public <KV extends V> LocalKey<KV> lk() {
+		return lk(new Key<>());
+	}
+
+	public static class Key<KV> {
 		private Key() {
 		}
 
-		@SuppressWarnings("unchecked")
+		public KV get(KeyMap<? super KV> map) {
+			return map.get(this);
+		}
+
+		public KV put(KeyMap<? super KV> map, KV data) {
+			return map.put(this, data);
+		}
+	}
+
+	public static class OptionalKey<KV> extends Key<KV> {
+		public boolean exists(KeyMap<?> map) {
+			return map.containsKey(this);
+		}
+	}
+
+	public class LocalKey<KV extends V> {
+		public final Key<KV> key;
+
+		public LocalKey(Key<KV> key) {
+			this.key = key;
+		}
+
 		public KV get() {
-			return (KV) data.get(this);
+			return key.get(KeyMap.this);
 		}
 
 		@SuppressWarnings("unchecked")
 		public KV put(KV data) {
-			return (KV) KeyMap.this.data.put(this, data);
+			return (KV) KeyMap.this.data.put(key, data);
 		}
-	}
 
-	public class OptionalKey<KV extends V> extends Key<KV> {
-		public boolean exists() {
-			return data.containsKey(this);
-		}
 	}
 
 }
