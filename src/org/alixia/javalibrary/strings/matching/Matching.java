@@ -1,10 +1,11 @@
 package org.alixia.javalibrary.strings.matching;
 
+import org.alixia.javalibrary.streams.CharacterStream;
+
 /**
  * @author Zeale
  */
 public interface Matching {
-	// TODO Use size comparisons rather than equality comparisons.
 	/**
 	 * Matches the given <code>text</code> against this object. Returns the
 	 * remaining text, i.e. the text that didn't match this object.
@@ -23,19 +24,14 @@ public interface Matching {
 	 * have matched.
 	 * 
 	 * @param text The text to match against this object.
-	 * @return <code>!text.equals(this.match(text))</code>
+	 * @return <code>text.length() != this.match().length()</code>
 	 */
 	default boolean matches(String text) {
-		return !text.equals(match(text));
+		return text.length() != match(text).length();
 	}
 
 	default boolean fullyMatches(String text) {
 		return match(text).isEmpty();
-	}
-
-	public static void main(String[] args) {
-		System.out.println(Matching.build("pot").possibly(Matching.ignoreCase("aTo")).match("potatO"));
-
 	}
 
 	static Matching build(String matching) {
@@ -55,10 +51,15 @@ public interface Matching {
 		return text -> {
 			if (text.isEmpty() || !Character.isWhitespace(text.charAt(0)))
 				return text;
-			// TODO Make more efficient.
-			while (!text.isEmpty() && Character.isWhitespace(text.charAt(0)))
-				text = text.substring(1);
-			return text;
+
+			CharacterStream strm = CharacterStream.from(text);
+			int c;
+			while ((c = strm.next()) != -1 && Character.isWhitespace(c))
+				;
+			StringBuffer buff = new StringBuffer();
+			while ((c = strm.next()) != -1)
+				buff.append((char) c);
+			return buff.toString();
 		};
 	}
 
@@ -66,7 +67,7 @@ public interface Matching {
 		return text -> {
 			if (text.isEmpty() || !(Character.isLetter(text.charAt(0)) || Character.isDigit(text.charAt(0))
 					|| text.charAt(0) == '_'))
-				return null;
+				return text;
 			while (!text.isEmpty() && (Character.isLetter(text.charAt(0)) || Character.isDigit(text.charAt(0))
 					|| text.charAt(0) == '_'))
 				text = text.substring(1);
@@ -103,24 +104,24 @@ public interface Matching {
 	default Matching or(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			return firstMatch.equals(text) ? other.match(text) : firstMatch;
+			return firstMatch.length() == text.length() ? other.match(text) : firstMatch;
 		};
 	}
 
 	default Matching then(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			return (!firstMatch.equals(text)) ? other.match(firstMatch) : text;
+			return (firstMatch.length() != text.length())/* Something was consumed */ ? other.match(firstMatch) : text;
 		};
 	}
 
 	default Matching possibly(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			if (firstMatch.equals(text))
+			if (firstMatch.length() == text.length())
 				return text;
 			String otherMatch = other.match(firstMatch);
-			return otherMatch.equals(text) ? firstMatch : otherMatch;
+			return otherMatch.length() == text.length() ? firstMatch : otherMatch;
 		};
 	}
 
@@ -139,7 +140,7 @@ public interface Matching {
 	static Matching possibly(Matching thiz, Matching then) {
 		return text -> {
 			String thisMatch = thiz.match(text);
-			return then.match(!thisMatch.equals(text) ? thisMatch : text);
+			return then.match(thisMatch.length() != text.length() ? thisMatch : text);
 		};
 	}
 
