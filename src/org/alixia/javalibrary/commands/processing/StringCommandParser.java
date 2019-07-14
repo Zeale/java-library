@@ -47,13 +47,13 @@ public class StringCommandParser {
 			if (c == '\\') {
 				if (!(escaped ^= true))
 					currArg.append('\\');
-			} else if (c == '"') {
+			} else if (c == '"')
 				if (escaped) {
 					currArg.append('"');
 					escaped = false;
 				} else
 					quote ^= true;
-			} else if (Character.isWhitespace(c)) {
+			else if (Character.isWhitespace(c))
 				if (quote) {
 					if (escaped) {
 						currArg.append("\\");
@@ -66,7 +66,7 @@ public class StringCommandParser {
 					while (Character.isWhitespace(c = stream.next()))
 						;
 				}
-			} else {
+			else {
 				if (escaped) {
 					currArg.append("\\");
 					escaped = false;
