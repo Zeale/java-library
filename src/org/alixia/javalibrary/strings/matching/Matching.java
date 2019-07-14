@@ -4,9 +4,10 @@ package org.alixia.javalibrary.strings.matching;
  * @author Zeale
  */
 public interface Matching {
+	// TODO Use size comparisons rather than equality comparisons.
 	/**
 	 * Matches the given <code>text</code> against this object. Returns the
-	 * remaining text, the text that didn't match this object.
+	 * remaining text, i.e. the text that didn't match this object.
 	 * 
 	 * @param text The {@link String} to match this object against.
 	 * @return The remaining text that didn't match this object.
@@ -28,8 +29,17 @@ public interface Matching {
 		return !text.equals(match(text));
 	}
 
+	default boolean fullyMatches(String text) {
+		return match(text).isEmpty();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(Matching.build("pot").possibly(Matching.ignoreCase("aTo")).match("potatO"));
+
+	}
+
 	static Matching build(String matching) {
-		return text -> text.startsWith(matching) ? text.substring(matching.length()) : null;
+		return text -> text.startsWith(matching) ? text.substring(matching.length()) : text;
 	}
 
 	static Matching build(String... matchings) {
@@ -37,14 +47,15 @@ public interface Matching {
 			for (String s : matchings)
 				if (text.startsWith(s))
 					return text.substring(s.length());
-			return null;
+			return text;
 		};
 	}
 
 	static Matching whitespace() {
 		return text -> {
 			if (text.isEmpty() || !Character.isWhitespace(text.charAt(0)))
-				return null;
+				return text;
+			// TODO Make more efficient.
 			while (!text.isEmpty() && Character.isWhitespace(text.charAt(0)))
 				text = text.substring(1);
 			return text;
@@ -69,12 +80,12 @@ public interface Matching {
 			for (String s : matchings)
 				if (text2.startsWith(s.toLowerCase()))
 					return text.substring(s.length());
-			return null;
+			return text;
 		};
 	}
 
 	static Matching ignoreCase(String matching) {
-		return text -> text.toLowerCase().startsWith(matching.toLowerCase()) ? text.substring(matching.length()) : null;
+		return text -> text.toLowerCase().startsWith(matching.toLowerCase()) ? text.substring(matching.length()) : text;
 	}
 
 	default Matching or(String... others) {
@@ -92,24 +103,24 @@ public interface Matching {
 	default Matching or(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			return firstMatch == null ? other.match(text) : firstMatch;
+			return firstMatch.equals(text) ? other.match(text) : firstMatch;
 		};
 	}
 
 	default Matching then(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			return (firstMatch != null) ? other.match(firstMatch) : null;
+			return (!firstMatch.equals(text)) ? other.match(firstMatch) : text;
 		};
 	}
 
 	default Matching possibly(Matching other) {
 		return text -> {
 			String firstMatch = match(text);
-			if (firstMatch == null)
-				return null;
+			if (firstMatch.equals(text))
+				return text;
 			String otherMatch = other.match(firstMatch);
-			return otherMatch == null ? firstMatch : otherMatch;
+			return otherMatch.equals(text) ? firstMatch : otherMatch;
 		};
 	}
 
@@ -128,7 +139,7 @@ public interface Matching {
 	static Matching possibly(Matching thiz, Matching then) {
 		return text -> {
 			String thisMatch = thiz.match(text);
-			return then.match(thisMatch != null ? thisMatch : text);
+			return then.match(!thisMatch.equals(text) ? thisMatch : text);
 		};
 	}
 
