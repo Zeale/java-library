@@ -65,6 +65,7 @@ public class StringCommandParser {
 					currArg.setLength(0);
 					while (Character.isWhitespace(c = stream.next()))
 						;
+					continue;
 				}
 			else {
 				if (escaped) {
