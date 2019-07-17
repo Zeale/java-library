@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class KeyMap<V, M extends Map<KeyMap.Key<?>, V>> implements Serializable {
+public class KeyMap<V, M extends Map<KeyMap.Key<? extends V>, V>> implements Serializable {
 
 	/**
 	 * SUID
@@ -17,11 +17,11 @@ public class KeyMap<V, M extends Map<KeyMap.Key<?>, V>> implements Serializable 
 		this.data = map;
 	}
 
-	public static <V, M extends Map<Key<?>, V>> KeyMap<V, M> keyMap(M map) {
+	public static <V, M extends Map<Key<? extends V>, V>> KeyMap<V, M> keyMap(M map) {
 		return new KeyMap<>(map);
 	}
 
-	public static <V> KeyMap<V, WeakHashMap<KeyMap.Key<?>, V>> keyMap() {
+	public static <V> KeyMap<V, WeakHashMap<KeyMap.Key<? extends V>, V>> keyMap() {
 		return new KeyMap<>(new WeakHashMap<>());
 	}
 
@@ -132,7 +132,6 @@ public class KeyMap<V, M extends Map<KeyMap.Key<?>, V>> implements Serializable 
 		public KV put(KV data) {
 			return (KV) KeyMap.this.data.put(key, data);
 		}
-
 	}
 
 }
