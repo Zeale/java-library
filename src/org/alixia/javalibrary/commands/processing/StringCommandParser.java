@@ -28,6 +28,23 @@ public class StringCommandParser {
 		this.commandInitiator = commandInitiator;
 	}
 
+	/**
+	 * Parses a command out of the given {@link String}. This method begins by
+	 * attempting to find the {@link #commandInitiator} at the start of the given
+	 * {@link String}. If it cannot find an exact match of the
+	 * {@link #commandInitiator}, for any reason (including the presence of
+	 * whitespace), this method will return <code>null</code>. Otherwise, the method
+	 * continues by trimming any whitespace. Once this whitespace, (which is after
+	 * the {@link #commandInitiator}), has been passed over, this method splits the
+	 * string by unquoted whitespace. If no command is found, the returned
+	 * {@link StringCommand#command StringCommand's command} will be an empty
+	 * string. If whitespace is found after the command or after an argument, but no
+	 * succeeding argument is found, there will be an empty {@link String} at the
+	 * end of the parsed {@link StringCommand#args} that is returned by this method.
+	 * 
+	 * @param input The input {@link String} to parse.
+	 * @return <code>null</code> or the parsed command as a {@link StringCommand}.
+	 */
 	public StringCommand parse(String input) {
 		CharacterStream stream = CharacterStream.from(input);
 
