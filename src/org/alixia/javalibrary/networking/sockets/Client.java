@@ -1,13 +1,14 @@
 package org.alixia.javalibrary.networking.sockets;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
-public class Client {
-	private final Socket socket;
+public class Client implements Closeable {
+	private Socket socket;
 	private final ObjectInputStream in;
 	private final ObjectOutputStream out;
 
@@ -18,8 +19,8 @@ public class Client {
 	/**
 	 * Sends the specified {@link Serializable} over the connection.
 	 * 
-	 * @param item
-	 * @throws IOException
+	 * @param item The {@link Serializable} to send.
+	 * @throws IOException If an {@link IOException} occurs.
 	 */
 	public boolean send(Serializable item) {
 		try {
@@ -57,6 +58,16 @@ public class Client {
 	public Client(Socket socket) throws IOException {
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream((this.socket = socket).getInputStream());
+	}
+
+	/**
+	 * Closes this {@link Client}'s underlying {@link Socket}.
+	 * 
+	 * @throws IOException As specified by {@link Socket#close()}.
+	 */
+	public void close() throws IOException {
+		socket.close();
+		socket = null;
 	}
 
 	/**
