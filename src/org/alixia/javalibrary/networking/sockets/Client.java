@@ -20,7 +20,9 @@ public class Client implements Closeable {
 	 * Sends the specified {@link Serializable} over the connection.
 	 * 
 	 * @param item The {@link Serializable} to send.
-	 * @throws IOException If an {@link IOException} occurs.
+	 * @return <code>true</code> if no {@link IOException} was thrown while
+	 *         attempting to write the specified object, <code>false</code>
+	 *         otherwise.
 	 */
 	public boolean send(Serializable item) {
 		try {
@@ -66,6 +68,8 @@ public class Client implements Closeable {
 	 * @throws IOException As specified by {@link Socket#close()}.
 	 */
 	public void close() throws IOException {
+		if (socket == null)
+			return;
 		socket.close();
 		socket = null;
 	}
