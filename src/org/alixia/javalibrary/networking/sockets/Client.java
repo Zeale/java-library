@@ -7,7 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
-import java.util.Optional;
+
+import org.alixia.javalibrary.util.Box;
 
 /**
  * <p>
@@ -96,7 +97,7 @@ public class Client implements Closeable {
 		socket = null;
 	}
 
-	public synchronized Optional<Serializable> read(int millisTimeout) throws ClassNotFoundException, IOException {
+	public synchronized Box<Serializable> read(int millisTimeout) throws ClassNotFoundException, IOException {
 		socket.setSoTimeout(millisTimeout);
 		long startTime = System.currentTimeMillis();
 		try {
@@ -110,17 +111,24 @@ public class Client implements Closeable {
 				socket.setSoTimeout((int) remainingTime);
 				readObject = in.readObject();
 			}
-			return Optional.ofNullable((Serializable) readObject);
+			return new Box<>((Serializable) readObject);
 		} catch (InterruptedIOException e) {
-			return Optional.empty();
+			return null;
 		} finally {
 			socket.setSoTimeout(0);
 		}
 	}
 
 	/**
+	 * <p>
 	 * Blocks until a {@link Serializable} piece of data is received from the
 	 * {@link #out internal ObjectInputStream hooked up to the Socket}.
+	 * </p>
+	 * <p>
+	 * Please note that: <b>All {@link Exception}s are fatal to this {@link Client}
+	 * object</b> as they may leave the {@link Client}'s underlying {@link #in input
+	 * stream} in an indeterminate state.
+	 * </p>
 	 * 
 	 * @return The next {@link Serializable} received.
 	 * @throws ClassNotFoundException As specified by
