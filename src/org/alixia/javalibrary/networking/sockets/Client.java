@@ -6,6 +6,7 @@ import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import org.alixia.javalibrary.util.Box;
@@ -35,6 +36,19 @@ public class Client implements Closeable {
 	private Socket socket;
 	private final ObjectInputStream in;
 	private final ObjectOutputStream out;
+
+	/**
+	 * Returns the underlying {@link Socket} that's backing this {@link Client}.
+	 * Although operations that are performed on the {@link Socket} directly are
+	 * unsupported by this class, the {@link Socket} is exposed so that information
+	 * can be retrieved from it, (e.g. the {@link InetAddress} that its connected
+	 * to).
+	 * 
+	 * @return The {@link Socket} used by this {@link Client} object.
+	 */
+	public Socket getSocket() {
+		return socket;
+	}
 
 	private static enum CommunicationCommands {
 		CONNECTION_CHECK, COMMUNICATION_RESPONSE;
