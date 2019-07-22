@@ -48,13 +48,13 @@ public class Client implements Closeable {
 	 *         attempting to write the specified object, <code>false</code>
 	 *         otherwise.
 	 */
-	public boolean send(Serializable item) {
+	public IOException send(Serializable item) {
 		try {
 			out.writeObject(item);
 			out.flush();
-			return true;
+			return null;
 		} catch (IOException e) {
-			return false;
+			return e;
 		}
 	}
 
@@ -63,7 +63,7 @@ public class Client implements Closeable {
 	 * it should ignore the object. This allows the user to check if a connection is
 	 * ok, since an exception will be thrown if it isn't.
 	 */
-	public boolean testConnection() {
+	public IOException testConnection() {
 		return send(CommunicationCommands.CONNECTION_CHECK);
 	}
 
