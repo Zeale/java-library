@@ -2,10 +2,12 @@ package org.alixia.javalibrary.networking.sockets;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.Optional;
 
 /**
  * <p>
@@ -94,33 +96,49 @@ public class Client implements Closeable {
 		socket = null;
 	}
 
+	public synchronized Optional<Serializable> read(int millisTimeout) throws ClassNotFoundException, IOException {
+		socket.setSoTimeout(millisTimeout);
+		long startTime = System.currentTimeMillis();
+		try {
+			Object readObject = in.readObject();
+			while (readObject instanceof CommunicationCommands) {
+				// Handle CommunicationCommands here.
+
+				long remainingTime = millisTimeout - System.currentTimeMillis() + startTime;
+				if (remainingTime < 0)
+					throw new InterruptedIOException();
+				socket.setSoTimeout((int) remainingTime);
+				readObject = in.readObject();
+			}
+			return Optional.ofNullable((Serializable) readObject);
+		} catch (InterruptedIOException e) {
+			return Optional.empty();
+		} finally {
+			socket.setSoTimeout(0);
+		}
+	}
+
 	/**
-	 * Blocks until a {@link Serializable} is received from the {@link #out internal
-	 * ObjectInputStream hooked up to the Socket}. This method will return
-	 * <code>null</code> if an {@link IOException} is thrown by the underlying
-	 * {@link ObjectInputStream}. As soon as this happens, this {@link Client}
-	 * should be considered closed.
+	 * Blocks until a {@link Serializable} piece of data is received from the
+	 * {@link #out internal ObjectInputStream hooked up to the Socket}.
 	 * 
 	 * @return The next {@link Serializable} received.
 	 * @throws ClassNotFoundException As specified by
 	 *                                {@link ObjectInputStream#readObject()}.
+	 * @throws IOException            If an {@link IOException} occurs while reading
+	 *                                the object.
 	 */
-	@SuppressWarnings("incomplete-switch")
-	public Serializable read() throws ClassNotFoundException {
-		try {
-			Object readObject = in.readObject();
-			while (readObject instanceof CommunicationCommands) {
-				switch ((CommunicationCommands) readObject) {
+	public synchronized Serializable read() throws ClassNotFoundException, IOException {
+		Object readObject = in.readObject();
+		while (readObject instanceof CommunicationCommands) {
+//			switch ((CommunicationCommands) readObject) {
 //				case CONNECTION_CHECK:
 //					send(CommunicationCommands.COMMUNICATION_RESPONSE);
-				// This will be dealt with later.
-				}
-				readObject = in.readObject();
-			}
-			return (Serializable) readObject;
-		} catch (IOException e) {
-			return null;
+			// This will be dealt with later.
+//			}
+			readObject = in.readObject();
 		}
+		return (Serializable) readObject;
 	}
 
 }
