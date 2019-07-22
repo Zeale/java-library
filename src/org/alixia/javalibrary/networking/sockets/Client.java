@@ -7,6 +7,27 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
+/**
+ * <p>
+ * The {@link Client} class provides reading and writing {@link Serializable}
+ * objects over a {@link Socket}. It can be paired with a {@link Server} to make
+ * the development of connections that communicate with {@link Serializable}
+ * objects easy.
+ * </p>
+ * <p>
+ * If attempting unsupported/lower-level communication with this class, please
+ * note that this class creates a new {@link ObjectOutputStream} over its given
+ * {@link Socket}'s {@link Socket#getOutputStream() output stream}, and then
+ * creates a new {@link ObjectInputStream} over the {@link Socket}'s
+ * {@link Socket#getInputStream() input stream}. These two operations
+ * <q>[write] the serialization stream header to the underlying stream</q>, and
+ * expect the same stream header from the other end of the connection,
+ * respectively.
+ * </p>
+ * 
+ * @author Zeale
+ *
+ */
 public class Client implements Closeable {
 	private Socket socket;
 	private final ObjectInputStream in;
@@ -27,6 +48,7 @@ public class Client implements Closeable {
 	public boolean send(Serializable item) {
 		try {
 			out.writeObject(item);
+			out.flush();
 			return true;
 		} catch (IOException e) {
 			return false;
@@ -37,9 +59,6 @@ public class Client implements Closeable {
 	 * Sends a "test" object. If a {@link Client}, like this, is on the other end,
 	 * it should ignore the object. This allows the user to check if a connection is
 	 * ok, since an exception will be thrown if it isn't.
-	 * 
-	 * @param item
-	 * @return
 	 */
 	public boolean testConnection() {
 		return send(CommunicationCommands.CONNECTION_CHECK);
@@ -59,6 +78,7 @@ public class Client implements Closeable {
 	 */
 	public Client(Socket socket) throws IOException {
 		out = new ObjectOutputStream(socket.getOutputStream());
+		out.flush();
 		in = new ObjectInputStream((this.socket = socket).getInputStream());
 	}
 
