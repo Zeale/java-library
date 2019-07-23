@@ -58,14 +58,15 @@ public class Client implements Closeable {
 	 * Sends the specified {@link Serializable} over the connection.
 	 * 
 	 * @param item The {@link Serializable} to send.
-	 * @return <code>true</code> if no {@link IOException} was thrown while
-	 *         attempting to write the specified object, <code>false</code>
-	 *         otherwise.
 	 */
-	public IOException send(Serializable item) {
+	public void send(Serializable item) throws IOException {
+		out.writeObject(item);
+		out.flush();
+	}
+
+	public IOException trySend(Serializable item) {
 		try {
-			out.writeObject(item);
-			out.flush();
+			send(item);
 			return null;
 		} catch (IOException e) {
 			return e;
@@ -78,7 +79,7 @@ public class Client implements Closeable {
 	 * ok, since an exception will be thrown if it isn't.
 	 */
 	public IOException testConnection() {
-		return send(CommunicationCommands.CONNECTION_CHECK);
+		return trySend(CommunicationCommands.CONNECTION_CHECK);
 	}
 
 	public boolean isConnected() {
