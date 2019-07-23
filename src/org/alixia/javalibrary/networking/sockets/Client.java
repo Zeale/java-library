@@ -111,6 +111,57 @@ public class Client implements Closeable {
 		socket = null;
 	}
 
+	/**
+	 * Attempts to close this {@link Client} by calling {@link #close()}. If an
+	 * {@link IOException} is produced by the call, it is caught and returned.
+	 * Otherwise, the method returns <code>null</code>.
+	 * 
+	 * @return <code>null</code> on a successful close but an {@link IOException}
+	 *         otherwise.
+	 */
+	public IOException tryClose() {
+		try {
+			close();
+		} catch (IOException e) {
+			return e;
+		}
+		return null;
+	}
+
+	/**
+	 * <p>
+	 * Blocks until a {@link Serializable} piece of information written by the
+	 * {@link Client} at the other endpoint is received, or until the given timeout.
+	 * </p>
+	 * <p>
+	 * As with {@link #read()}, all exceptions that this method may arouse are fatal
+	 * to the underlying socket, and, thus, to this {@link Client} object. After an
+	 * exception, the {@link Client} object should be discarded.
+	 * </p>
+	 * <p>
+	 * This method expects a returnable {@link Serializable} object to be received
+	 * from the other endpoint of this connection within the specified amount of
+	 * time. Because of this, it sets an {@link Socket#setSoTimeout(int) SO Timeout}
+	 * on the underlying socket right before calling the read method, and then waits
+	 * for the object. If a returnable, {@link Serializable} object is received
+	 * within the time, the method returns the object. If a
+	 * {@link CommunicationCommands Communication Command} is received instead, it
+	 * is handled and then the reading process is repeated with the SO Timeout set
+	 * to the delay time specified as an argument to this method minus the current
+	 * time plus the time recorded at this method's calling, so long as the new
+	 * timeout is valid. If not valid, the method simply returns null.
+	 * </p>
+	 * 
+	 * @param millisTimeout The timeout in milliseconds.
+	 * @return A {@link Box} containing the read value, or <code>null</code> if
+	 *         there was a timeout.
+	 * @throws ClassNotFoundException If a {@link ClassNotFoundException} occurs
+	 *                                while reading an object from the underlying
+	 *                                {@link ObjectInputStream#readObject()}.
+	 * @throws IOException            If an {@link IOException} occurs while reading
+	 *                                an object from the underlying
+	 *                                {@link ObjectInputStream#readObject()}.
+	 */
 	public synchronized Box<Serializable> read(int millisTimeout) throws ClassNotFoundException, IOException {
 		socket.setSoTimeout(millisTimeout);
 		long startTime = System.currentTimeMillis();
@@ -121,7 +172,7 @@ public class Client implements Closeable {
 
 				long remainingTime = millisTimeout - System.currentTimeMillis() + startTime;
 				if (remainingTime < 0)
-					throw new InterruptedIOException();
+					return null;
 				socket.setSoTimeout((int) remainingTime);
 				readObject = in.readObject();
 			}
