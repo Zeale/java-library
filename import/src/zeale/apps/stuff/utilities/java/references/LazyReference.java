@@ -30,4 +30,8 @@ public abstract class LazyReference<T> implements Supplier<T> {
 		return generated;
 	}
 
+	public void regenerate() {
+		ref = generate();
+	}
+
 }
