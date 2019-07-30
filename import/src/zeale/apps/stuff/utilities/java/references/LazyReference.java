@@ -26,4 +26,8 @@ public abstract class LazyReference<T> implements Supplier<T> {
 		};
 	}
 
+	public boolean exists() {
+		return generated;
+	}
+
 }
