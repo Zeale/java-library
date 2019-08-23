@@ -295,12 +295,14 @@ public final class BindingTools {
 									glass.add(t1);
 								}
 						else if (c.wasRemoved())
-							NEXT_ITEM: for (T t2 : c.getRemoved())
+//							NEXT_ITEM:
+							for (T t2 : c.getRemoved())
 								synchronized (this) {
 //									if (FilterBinding.this.filters.size() < glass.size()) {
-									for (Function<? super T, Boolean> f2 : this.filters)
-										if (!f2.apply(t2))
-											continue NEXT_ITEM;
+//									for (Function<? super T, Boolean> f2 : this.filters)
+//										if (!f2.apply(t2))
+//											continue NEXT_ITEM;
+//									// The above assumes that items can't change.
 									glass.remove(t2);
 //									} else
 //										glass.remove(t);
