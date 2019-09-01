@@ -1,5 +1,6 @@
 package org.alixia.javalibrary;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -267,6 +268,18 @@ public final class JavaTools {
 			}
 
 		};
+	}
+
+	public static double findMedian(double... values) {
+		double[] copy = values.clone();
+		return findMedianUnsafe(copy);
+	}
+
+	public static double findMedianUnsafe(double... values) {
+		// TODO Improve
+		Arrays.sort(values);
+		return (values.length & 1) == 0 ? (values[values.length / 2] + values[values.length / 2 - 1]) / 2
+				: values[values.length / 2];
 	}
 
 }
