@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.Stack;
 import java.util.function.Predicate;
@@ -280,6 +282,10 @@ public final class JavaTools {
 
 	public static double findMedianUnsafe(double... values) {
 		// TODO Improve
+		if (values == null)
+			throw null;
+		if (values.length == 0)
+			return 0;
 		Arrays.sort(values);
 		return (values.length & 1) == 0 ? (values[values.length / 2] + values[values.length / 2 - 1]) / 2
 				: values[values.length / 2];
@@ -302,12 +308,48 @@ public final class JavaTools {
 		return findMedianUnsafe(new ArrayList<>(items), comparator);
 	}
 
+	/**
+	 * Returns a {@link Pair} object if the given list is not empty or
+	 * <code>null</code>. Under these circumstances, if the given list's size is
+	 * even, the {@link Pair} returned will contain the items in the list at indexes
+	 * <code>list.size() / 2 - 1</code> and <code>list.size() / 2</code>,
+	 * respectively. If the list's size is odd, the {@link Pair} will consist of the
+	 * item in the list at index <code>list.size() / 2</code>, and
+	 * <code>null</code>, respectively. If the list is empty, this method returns
+	 * <code>null</code>, and if the given list is <code>null</code>, this method
+	 * throws <code>null</code>.
+	 * 
+	 * @param <E>   The type of object held by the given list.
+	 * @param items The list of items to get the middle element(s) of.
+	 * @return A {@link Pair} consisting of both of the middle elements if the
+	 *         list's size is even, or the middle element if the list's size is odd.
+	 */
 	private static <E> Pair<E, E> getMidElement(List<? extends E> items) {
+		if (items == null)
+			throw null;
+		if (items.isEmpty())
+			return null;
 		if ((items.size() & 1) == 0) {
 			Iterator<? extends E> itr = items.listIterator(items.size() / 2 - 1);
 			return new Pair<E, E>(itr.next(), itr.next());
 		} else
 			return new Pair<E, E>(items.get(items.size() / 2), null);
+	}
+
+	public static <E> Map<E, Integer> frequencyMap(Iterator<? extends E> itr) {
+		Map<E, Integer> freqmap = new HashMap<>();
+		for (; itr.hasNext();) {
+			E val = itr.next();
+			if (freqmap.containsKey(val))
+				freqmap.put(val, freqmap.get(val) + 1);
+			else
+				freqmap.put(val, 0);
+		}
+		return freqmap;
+	}
+
+	public static <E> Map<E, Integer> frequencyMap(Iterable<? extends E> itr) {
+		return frequencyMap(itr.iterator());
 	}
 
 }
