@@ -1,5 +1,6 @@
 package org.alixia.javalibrary;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -10,6 +11,8 @@ import java.util.Spliterator;
 import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import org.alixia.javalibrary.util.Pair;
 
 public final class JavaTools {
 	private JavaTools() {
@@ -280,6 +283,31 @@ public final class JavaTools {
 		Arrays.sort(values);
 		return (values.length & 1) == 0 ? (values[values.length / 2] + values[values.length / 2 - 1]) / 2
 				: values[values.length / 2];
+	}
+
+	public static <E extends Comparable<? extends E>> Pair<E, E> findMedianUnsafe(List<? extends E> items) {
+		return findMedianUnsafe(items, null);
+	}
+
+	public static <E extends Comparable<? extends E>> Pair<E, E> findMedian(List<? extends E> items) {
+		return findMedianUnsafe(new ArrayList<>(items));
+	}
+
+	public static <E> Pair<E, E> findMedianUnsafe(List<? extends E> items, Comparator<E> comparator) {
+		items.sort(comparator);
+		return getMidElement(items);
+	}
+
+	public static <E> Pair<E, E> findMedian(List<? extends E> items, Comparator<E> comparator) {
+		return findMedianUnsafe(new ArrayList<>(items), comparator);
+	}
+
+	private static <E> Pair<E, E> getMidElement(List<? extends E> items) {
+		if ((items.size() & 1) == 0) {
+			Iterator<? extends E> itr = items.listIterator(items.size() / 2 - 1);
+			return new Pair<E, E>(itr.next(), itr.next());
+		} else
+			return new Pair<E, E>(items.get(items.size() / 2), null);
 	}
 
 }
