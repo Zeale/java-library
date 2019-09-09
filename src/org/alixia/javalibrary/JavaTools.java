@@ -1,5 +1,6 @@
 package org.alixia.javalibrary;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +24,19 @@ public final class JavaTools {
 	@SafeVarargs
 	public static final <T> T pickRandomElement(T... ts) {
 		return ts[(int) (Math.random() * ts.length)];
+	}
+
+	/**
+	 * Deletes each file and its children if the file is a directory.
+	 * 
+	 * @param files The files to delete.
+	 */
+	public static final void deltree(File... files) {
+		for (File f : files)
+			if (f.isDirectory())
+				deltree(f.listFiles());
+			else
+				f.delete();
 	}
 
 	public static <E> ListIterator<E> unmodifyingListIterator(ListIterator<E> base) {
