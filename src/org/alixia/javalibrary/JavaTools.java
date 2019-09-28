@@ -345,9 +345,9 @@ public final class JavaTools {
 			return null;
 		if ((items.size() & 1) == 0) {
 			Iterator<? extends E> itr = items.listIterator(items.size() / 2 - 1);
-			return new Pair<E, E>(itr.next(), itr.next());
-		} else
-			return new Pair<E, E>(items.get(items.size() / 2), null);
+			return new Pair<>(itr.next(), itr.next());
+		}
+		return new Pair<>(items.get(items.size() / 2), null);
 	}
 
 	public static <E> Map<E, Integer> frequencyMap(Iterator<? extends E> itr) {
@@ -357,7 +357,7 @@ public final class JavaTools {
 			if (freqmap.containsKey(val))
 				freqmap.put(val, freqmap.get(val) + 1);
 			else
-				freqmap.put(val, 0);
+				freqmap.put(val, 1);
 		}
 		return freqmap;
 	}
