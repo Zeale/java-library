@@ -12,6 +12,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -37,6 +38,25 @@ public final class JavaTools {
 				deltree(f.listFiles());
 			else
 				f.delete();
+	}
+
+	public static <F, T> Iterator<T> mask(Iterator<? extends F> itr, Function<? super F, ? extends T> conv) {
+		return new Iterator<T>() {
+
+			@Override
+			public boolean hasNext() {
+				return itr.hasNext();
+			}
+
+			@Override
+			public T next() {
+				return conv.apply(itr.next());
+			}
+		};
+	}
+
+	public static <F, T> Iterable<T> mask(Iterable<? extends F> itr, Function<? super F, ? extends T> conv) {
+		return () -> mask(itr.iterator(), conv);
 	}
 
 	public static <E> ListIterator<E> unmodifyingListIterator(ListIterator<E> base) {
