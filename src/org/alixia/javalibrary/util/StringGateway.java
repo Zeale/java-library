@@ -5,4 +5,8 @@ public interface StringGateway<T> extends Gateway<String, T> {
 	default String from(T value) {
 		return value.toString();
 	}
+
+	static StringGateway<String> string() {
+		return a -> a;
+	}
 }
