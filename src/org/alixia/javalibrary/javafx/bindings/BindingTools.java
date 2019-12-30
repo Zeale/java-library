@@ -3,6 +3,7 @@ package org.alixia.javalibrary.javafx.bindings;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +112,163 @@ public final class BindingTools {
 			@Override
 			public T getValue() {
 				return converter.apply(prop.getValue());
+			}
+		};
+	}
+
+	public static <F, T> Property<T> mask(Property<F> prop, Gateway<F, T> gateway) {
+		return new Property<T>() {
+			private Property<T> val = this;
+
+			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new WeakHashMap<>();
+
+			class IntermediaryValue implements ObservableValue<T> {
+				private final List<InvalidationListener> ils = new ArrayList<>();
+				private final List<ChangeListener<? super T>> cls = new ArrayList<>();
+				private T value;
+
+				@Override
+				public void addListener(InvalidationListener listener) {
+					ils.add(listener);
+				}
+
+				@Override
+				public void removeListener(InvalidationListener listener) {
+					ils.remove(listener);
+				}
+
+				@Override
+				public void addListener(ChangeListener<? super T> listener) {
+					cls.add(listener);
+				}
+
+				@Override
+				public void removeListener(ChangeListener<? super T> listener) {
+					cls.remove(listener);
+				}
+
+				@Override
+				public T getValue() {
+					return value;
+				}
+
+				public void changed(T oldVal) {
+					for (InvalidationListener il : ils)
+						il.invalidated(this);
+					for (ChangeListener<? super T> cl : cls)
+						cl.changed(this, oldVal, value);
+				}
+			}
+
+			private final IntermediaryValue intermediary = new IntermediaryValue();
+
+			ObservableValue<F> intMask = mask(((ObservableValue<T>) intermediary), gateway.to());
+
+			class IncrementetiveChangeListener implements ChangeListener<F> {
+
+				private int count;
+
+				private final ChangeListener<? super T> backing;
+
+				public IncrementetiveChangeListener(ChangeListener<? super T> backing) {
+					this.backing = backing;
+				}
+
+				@Override
+				public void changed(ObservableValue<? extends F> observable, F oldValue, F newValue) {
+					for (int i = 0; i < count; i++)
+						backing.changed(val, gateway.to(oldValue), gateway.to(newValue));
+				}
+
+			}
+
+			@Override
+			public Object getBean() {
+				return prop.getBean();
+			}
+
+			@Override
+			public String getName() {
+				return prop.getName();
+			}
+
+			@Override
+			public T getValue() {
+				return gateway.to(prop.getValue());
+			}
+
+			@Override
+			public void addListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					listeners.get(listener).count++;
+				else
+					listeners.put(listener, new IncrementetiveChangeListener(listener));
+			}
+
+			@Override
+			public void removeListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					if (listeners.get(listener).count-- < 0)
+						listeners.remove(listener);
+			}
+
+			@Override
+			public void addListener(InvalidationListener arg0) {
+				prop.addListener(arg0);
+			}
+
+			@Override
+			public void removeListener(InvalidationListener arg0) {
+				prop.removeListener(arg0);
+			}
+
+			@Override
+			public void setValue(T arg0) {
+				prop.setValue(gateway.from(arg0));
+			}
+
+			private ChangeListener<T> listener = new ChangeListener<T>() {
+
+				@Override
+				public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
+					T oldVal = intermediary.value;
+					intermediary.value = newValue;
+					intermediary.changed(oldVal);
+				}
+			};
+			private ObservableValue<? extends T> currentObserver;
+
+			@Override
+			public void bind(ObservableValue<? extends T> observable) {
+				if (currentObserver != null)
+					unbind();
+				intermediary.value = observable.getValue();
+				prop.bind(intMask);
+				(currentObserver = observable).addListener(listener);
+			}
+
+			private final Map<Property<T>, PipewayBinding<?, ?, ?, ?>> bibinds = new HashMap<>();
+
+			@Override
+			public void bindBidirectional(Property<T> other) {
+				BindingTools.bindBidirectional(prop, gateway, other);
+			}
+
+			@Override
+			public boolean isBound() {
+				return prop.isBound();
+			}
+
+			@Override
+			public void unbind() {
+				prop.unbind();
+				currentObserver.removeListener(listener);
+			}
+
+			@Override
+			public void unbindBidirectional(Property<T> other) {
+				if (bibinds.containsKey(other))
+					bibinds.remove(other).unbind();
 			}
 		};
 	}
