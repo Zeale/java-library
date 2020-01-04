@@ -15,6 +15,7 @@ import org.alixia.chatroom.api.QuickList;
 import org.alixia.javalibrary.util.Gateway;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
@@ -30,6 +31,66 @@ public final class BindingTools {
 	public static <F, T> void bind(ObservableValue<F> from, Function<? super F, ? extends T> converter,
 			Property<T> to) {
 		to.bind(Bindings.createObjectBinding(() -> converter.apply(from.getValue()), from));
+	}
+
+	public static <F, T, O extends Observable> ObservableValue<T> toObservableValue(O obs,
+			Function<O, T> valueSupplier) {
+		return new ObservableValue<T>() {
+
+			private final Map<ChangeListener<? super T>, Listener> listeners = new HashMap<>();
+			private final ObservableValue<T> inst = this;
+
+			class Listener implements InvalidationListener {
+				private int count;
+				private final ChangeListener<? super T> backing;
+				private T currentValue = valueSupplier.apply(obs);
+
+				public Listener(ChangeListener<? super T> backing) {
+					this.backing = backing;
+				}
+
+				@Override
+				public void invalidated(Observable observable) {
+					T nv = valueSupplier.apply(obs);
+					if (currentValue != nv)
+						for (int i = 0; i < count; i++)
+							backing.changed(inst, currentValue, nv);
+					currentValue = nv;
+
+				}
+
+			}
+
+			@Override
+			public void addListener(InvalidationListener listener) {
+				obs.addListener(listener);
+			}
+
+			@Override
+			public void removeListener(InvalidationListener listener) {
+				obs.removeListener(listener);
+			}
+
+			@Override
+			public void addListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					listeners.get(listener).count++;
+				else
+					listeners.put(listener, new Listener(listener));
+			}
+
+			@Override
+			public void removeListener(ChangeListener<? super T> listener) {
+				if (listeners.containsKey(listener))
+					if (listeners.get(listener).count-- < 0)
+						listeners.remove(listener);
+			}
+
+			@Override
+			public T getValue() {
+				return valueSupplier.apply(obs);
+			}
+		};
 	}
 
 	/**
@@ -82,7 +143,7 @@ public final class BindingTools {
 
 			}
 
-			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new WeakHashMap<>();
+			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new HashMap<>();
 
 			@Override
 			public void addListener(InvalidationListener listener) {
@@ -120,7 +181,7 @@ public final class BindingTools {
 		return new Property<T>() {
 			private Property<T> val = this;
 
-			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new HashMap<>();
+			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new WeakHashMap<>();
 
 			class IntermediaryValue implements ObservableValue<T> {
 				private final List<InvalidationListener> ils = new ArrayList<>();
