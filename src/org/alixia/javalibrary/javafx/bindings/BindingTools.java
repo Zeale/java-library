@@ -120,7 +120,7 @@ public final class BindingTools {
 		return new Property<T>() {
 			private Property<T> val = this;
 
-			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new WeakHashMap<>();
+			Map<ChangeListener<? super T>, IncrementetiveChangeListener> listeners = new HashMap<>();
 
 			class IntermediaryValue implements ObservableValue<T> {
 				private final List<InvalidationListener> ils = new ArrayList<>();
