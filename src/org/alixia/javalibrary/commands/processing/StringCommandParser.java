@@ -17,6 +17,10 @@ public class StringCommandParser {
 
 	private String commandInitiator;
 
+	public String getCommandInitiator() {
+		return commandInitiator;
+	}
+
 	public StringCommandParser(String commandChar) {
 		if ((commandInitiator = commandChar) == null)
 			throw new IllegalArgumentException();
@@ -26,6 +30,24 @@ public class StringCommandParser {
 		if (commandInitiator == null)
 			throw new IllegalArgumentException();
 		this.commandInitiator = commandInitiator;
+	}
+
+	/**
+	 * Parses the {@link #commandInitiator} from the given {@link CharacterStream}
+	 * that represents a command invocation. <code>false</code> is returned if the
+	 * command initiator is found in the stream, and <code>true</code> is returned
+	 * otherwise. This method leaves off such that the next character in the stream
+	 * is the character immediately after the command separator.
+	 * 
+	 * @param stream The stream to parse.
+	 * @return <code>true</code> if the command initiator is NOT found in the
+	 *         stream, and <code>false</code> otherwise.
+	 */
+	protected boolean parseCommandInitiator(CharacterStream stream) {
+		for (int i = 0; i < commandInitiator.length(); i++)
+			if (stream.next() != commandInitiator.charAt(i))
+				return true;
+		return false;
 	}
 
 	/**
@@ -48,9 +70,8 @@ public class StringCommandParser {
 	public StringCommand parse(String input) {
 		CharacterStream stream = CharacterStream.from(input);
 
-		for (int i = 0; i < commandInitiator.length(); i++)
-			if (stream.next() != commandInitiator.charAt(i))
-				return null;
+		if (parseCommandInitiator(stream))
+			return null;
 
 		List<String> args = new LinkedList<>();
 
@@ -73,7 +94,7 @@ public class StringCommandParser {
 			else if (Character.isWhitespace(c))
 				if (quote) {
 					if (escaped) {
-						currArg.append("\\");
+						currArg.append('\\');
 						escaped = false;
 					}
 					currArg.append((char) c);
