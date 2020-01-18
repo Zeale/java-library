@@ -55,6 +55,29 @@ public final class JavaTools {
 		};
 	}
 
+	public static <E> Iterable<E> iterable(E[] arr) {
+		return new Iterable<E>() {
+
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+
+					int pos;
+
+					@Override
+					public boolean hasNext() {
+						return pos < arr.length;
+					}
+
+					@Override
+					public E next() {
+						return arr[pos++];
+					}
+				};
+			}
+		};
+	}
+
 	public static <F, T> Iterable<T> mask(Iterable<? extends F> itr, Function<? super F, ? extends T> conv) {
 		return () -> mask(itr.iterator(), conv);
 	}
