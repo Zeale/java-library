@@ -58,7 +58,8 @@ public class StringCommandParser {
 	 * whitespace), this method will return <code>null</code>. Otherwise, the method
 	 * continues by trimming any whitespace. Once this whitespace, (which is after
 	 * the {@link #commandInitiator}), has been passed over, this method splits the
-	 * string by unquoted whitespace. If no command is found, the returned
+	 * string by unquoted whitespace. The first result of the split is considered
+	 * the command. If no command is found, the returned
 	 * {@link StringCommand#command StringCommand's command} will be an empty
 	 * string. If whitespace is found after the command or after an argument, but no
 	 * succeeding argument is found, there will be an empty {@link String} at the
