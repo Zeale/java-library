@@ -12,7 +12,7 @@ public class JSONArray extends ArrayList<JSONValue> implements JSONValue {
 	@Override
 	public String toString(String indentation) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(indentation).append('[');
+		builder.append('[');
 		if (isEmpty())
 			builder.append('\t');
 		else {
