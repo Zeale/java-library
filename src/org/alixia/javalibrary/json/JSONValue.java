@@ -1,5 +1,7 @@
 package org.alixia.javalibrary.json;
 
-public interface JSONValue {
+import java.io.Serializable;
+
+public interface JSONValue extends Serializable {
 
 }
