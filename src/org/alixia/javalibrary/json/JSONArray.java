@@ -9,4 +9,23 @@ public class JSONArray extends ArrayList<JSONValue> implements JSONValue {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Override
+	public String toString(String indentation) {
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		if (isEmpty())
+			builder.append('\t');
+		else
+			for (JSONValue v : this)
+				builder.append('\n').append(indentation).append('\t').append(v.toString(indentation + '\t'));
+		builder.append(']');
+
+		return builder.toString();
+	}
+
+	@Override
+	public String toString() {
+		return toString("");
+	}
+
 }

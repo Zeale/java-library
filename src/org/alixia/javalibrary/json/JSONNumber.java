@@ -51,4 +51,14 @@ public class JSONNumber extends Number implements JSONValue {
 		return val;
 	}
 
+	@Override
+	public String toString() {
+		return (neg ? "-" : "") + left + '.' + right + 'E' + exp;
+	}
+
+	@Override
+	public String toString(String indentation) {
+		return toString();
+	}
+
 }

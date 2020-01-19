@@ -14,4 +14,15 @@ public class JSONString implements JSONValue {
 	public String getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/").replace("\b", "\\b")
+				.replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t") + '"';
+	}
+
+	@Override
+	public String toString(String indentation) {
+		return toString();
+	}
 }
