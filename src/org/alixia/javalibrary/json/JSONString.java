@@ -17,8 +17,9 @@ public class JSONString implements JSONValue {
 
 	@Override
 	public String toString() {
-		return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/").replace("\b", "\\b")
-				.replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t") + '"';
+		return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"")
+				// .replace("/", "\\/")
+				.replace("\b", "\\b").replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t") + '"';
 	}
 
 	@Override
