@@ -12,13 +12,15 @@ public class JSONArray extends ArrayList<JSONValue> implements JSONValue {
 	@Override
 	public String toString(String indentation) {
 		StringBuilder builder = new StringBuilder();
-		builder.append('[');
+		builder.append(indentation).append('[');
 		if (isEmpty())
 			builder.append('\t');
-		else
+		else {
 			for (JSONValue v : this)
 				builder.append('\n').append(indentation).append('\t').append(v.toString(indentation + '\t'));
-		builder.append(']');
+			builder.append('\n');
+		}
+		builder.append(indentation).append(']');
 
 		return builder.toString();
 	}

@@ -17,14 +17,16 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 	@Override
 	public String toString(String indentation) {
 		StringBuilder builder = new StringBuilder();
-		builder.append('{');
+		builder.append(indentation).append('{');
 		if (isEmpty())
 			builder.append('\t');
-		else
+		else {
 			for (Entry<String, JSONValue> e : entrySet())
 				builder.append('\n').append(indentation).append('\t').append('"').append(e.getKey()).append('"')
 						.append(':').append(e.getValue().toString(indentation + '\t'));
-		builder.append('}');
+			builder.append('\n');
+		}
+		builder.append(indentation).append('}');
 
 		return builder.toString();
 	}

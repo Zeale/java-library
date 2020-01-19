@@ -53,7 +53,13 @@ public class JSONNumber extends Number implements JSONValue {
 
 	@Override
 	public String toString() {
-		return (neg ? "-" : "") + left + '.' + right + 'E' + exp;
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append((neg ? "-" : "")).append(left);
+		if (right != null)
+			stringBuilder.append('.').append(right);
+		if (exp != null)
+			stringBuilder.append('E').append(exp);
+		return stringBuilder.toString();
 	}
 
 	@Override
