@@ -128,6 +128,7 @@ public class JSONParser {
 				c = parseWhitespace(stream);
 				if (c != '"')
 					throw new IllegalArgumentException("Malformed JSON.");
+				str = parseHeadlessString(stream);
 				c = parseWhitespace(stream);
 				if (c == -1)
 					throw new IllegalArgumentException("Malformed JSON. End of input reached while parsing object.");
@@ -136,9 +137,9 @@ public class JSONParser {
 				else
 					obj.put(str.getValue(), parseValue(stream.next(), stream));
 			}
-			if (c == '}') {
+			if (c == '}')
 				return obj;
-			} else
+			else
 				throw new IllegalArgumentException("Malformed JSON.");
 		}
 	}
@@ -167,7 +168,7 @@ public class JSONParser {
 
 	private JSONNumber parseNumber(int curr, CharacterSequence stream) {
 		boolean neg = curr == '-';
-		if (!neg)
+		if (neg)
 			curr = stream.next();
 		StringBuilder left = new StringBuilder();
 
@@ -184,8 +185,9 @@ public class JSONParser {
 			curr = stream.next();
 		}
 
-		StringBuilder right = new StringBuilder();
+		StringBuilder right = null;
 		if (curr == '.') {
+			right = new StringBuilder();
 			curr = stream.next();
 			if (curr == -1)
 				throw new IllegalArgumentException("Malformed JSON. End of input reached while parsing number.");
@@ -196,8 +198,9 @@ public class JSONParser {
 				right.append((char) curr);
 		}
 
-		StringBuilder exp = new StringBuilder();
+		StringBuilder exp = null;
 		if (curr == 'e' || curr == 'E') {
+			exp = new StringBuilder();
 			curr = stream.next();
 			if (curr == -1)
 				throw new IllegalArgumentException("Malformed JSON. End of input reached while parsing number.");
@@ -212,7 +215,8 @@ public class JSONParser {
 		}
 		stream.back();
 
-		return new JSONNumber(neg, left.toString(), right.toString(), exp.toString());
+		return new JSONNumber(neg, left.toString(), right == null ? null : right.toString(),
+				exp == null ? null : exp.toString());
 	}
 
 	/**
