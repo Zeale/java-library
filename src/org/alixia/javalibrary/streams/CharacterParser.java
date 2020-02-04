@@ -31,4 +31,20 @@ public interface CharacterParser extends CharacterStream {
 			}
 		};
 	}
+
+	static CharacterParser from(CharacterStream stream) {
+		return new CharacterParser() {
+			int curr = -2;
+
+			@Override
+			public int next() {
+				return curr = stream.next();
+			}
+
+			@Override
+			public int curr() throws RuntimeException {
+				return curr;
+			}
+		};
+	}
 }
