@@ -103,6 +103,16 @@ public interface Matching {
 
 	static Matching build(String... matchings) {
 		return text -> {
+			int m = 0;
+			for (String s : matchings)
+				if (s.length() > m && text.startsWith(s.toLowerCase()))
+					m = s.length();
+			return text.substring(m);
+		};
+	}
+
+	static Matching buildLazy(String... matchings) {
+		return text -> {
 			for (String s : matchings)
 				if (text.startsWith(s))
 					return text.substring(s.length());
@@ -139,11 +149,43 @@ public interface Matching {
 		};
 	}
 
+	/**
+	 * <p>
+	 * Returns a {@link Matching} that represents an inclusive OR between the
+	 * specified {@link String}s, disregarding capitalization. The results of calls
+	 * to {@link #match(String)} on the resulting {@link Matching} are the longest
+	 * match possible given the {@link String}s specified when calling this method
+	 * (the {@link Matching} is eager).
+	 * </p>
+	 * <p>
+	 * The resulting {@link Matching} favors the arguments to a call to this method
+	 * that match more of the input given to the {@link Matching} than others, in
+	 * that if a {@link Matching} is built with this method using the arguments
+	 * <code>a</code>, and <code>abc</code>, in that order, then the string
+	 * <code>abcde</code> would render <code>de</code> when checked against the
+	 * resulting {@link Matching}.
+	 * <p>
+	 * 
+	 * @param matchings The {@link String}s that the resulting {@link Matching}
+	 *                  should match against.
+	 * @return An inclusive-OR, eager {@link Matching}.
+	 */
 	static Matching ignoreCase(String... matchings) {
 		return text -> {
 			String text2 = text.toLowerCase();
+			int m = 0;
 			for (String s : matchings)
-				if (text2.startsWith(s.toLowerCase()))
+				if (s.length() > m && text2.startsWith(s.toLowerCase()))
+					m = s.length();
+			return text.substring(m);
+		};
+	}
+
+	static Matching ignoreCaseLazy(String... matchings) {
+		return text -> {
+			String text2 = text.toLowerCase();
+			for (String s : matchings)
+				if (text2.startsWith(s))
 					return text.substring(s.length());
 			return text;
 		};
