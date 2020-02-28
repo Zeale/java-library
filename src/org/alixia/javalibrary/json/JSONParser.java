@@ -81,14 +81,34 @@ public class JSONParser {
 						builder.append((char) Integer.parseUnsignedInt(n.toString(), 16));
 
 						break;
+					case '"':
+						builder.append('"');
+						break;
+					case '\'':
+						builder.append('\'');
+						break;
 					default:
-						throw new IllegalArgumentException("Malformed JSON.");
+						if (strictEscapeHandling)
+							throw new IllegalArgumentException(
+									"Malformed JSON. An illegal escape was found: " + (char) c);
+						else
+							builder.append('\\').append((char) c);
 					}
 					escaped = false;
 				} else
 					builder.append((char) c);
 			}
 		}
+	}
+
+	private boolean strictEscapeHandling = false;
+
+	public boolean isStrictEscapeHandling() {
+		return strictEscapeHandling;
+	}
+
+	public void setStrictEscapeHandling(boolean strictEscapeHandling) {
+		this.strictEscapeHandling = strictEscapeHandling;
 	}
 
 	/**
