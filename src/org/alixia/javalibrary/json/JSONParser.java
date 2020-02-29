@@ -37,9 +37,10 @@ public class JSONParser {
 		while (true) {
 			c = stream.next();
 			if (c == '"')
-				if (escaped)
+				if (escaped) {
 					builder.append('"');
-				else
+					escaped = false;
+				} else
 					return new JSONString(builder.toString());
 			else if (c == '\\') {
 				if (!(escaped ^= true))
