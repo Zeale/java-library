@@ -1,7 +1,6 @@
 package org.alixia.javalibrary.commands;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -92,13 +91,11 @@ public class GenericCommandManager<D> implements AbstractCommandManager<D> {
 	public boolean run(D data) {
 
 		// Optional consumers are checked,
-		if (!optionalConsumers.isEmpty())
-			for (Iterator<OptionalGenericCommandConsumer<? super D>> iterator = optionalConsumers.iterator(); iterator
-					.hasNext();)
-				if (iterator.next().act(data)) {
-					iterator.remove();
-					return true;
-				}
+		while (!optionalConsumers.isEmpty())
+			if (optionalConsumers.peek().act(data)) {
+				optionalConsumers.pop();
+				return true;
+			}
 
 		// then regular consumers are checked,
 		if (!consumers.isEmpty()) {
