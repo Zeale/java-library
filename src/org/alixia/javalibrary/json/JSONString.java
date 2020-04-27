@@ -1,5 +1,7 @@
 package org.alixia.javalibrary.json;
 
+import java.util.Collection;
+
 public class JSONString implements JSONValue {
 	/**
 	 * SUID
@@ -20,6 +22,11 @@ public class JSONString implements JSONValue {
 		return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"")
 				// .replace("/", "\\/")
 				.replace("\b", "\\b").replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t") + '"';
+	}
+
+	public static <T extends Collection<? super String>> void addAll(Collection<? extends JSONString> c, T t) {
+		for (JSONString j : c)
+			t.add(j.toString());
 	}
 
 	@Override
