@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,6 +39,12 @@ public class Datamap extends HashMap<String, String> {
 
 	public void save(OutputStream output) {
 		try (PrintWriter writer = new PrintWriter(output)) {
+			write(writer);
+		}
+	}
+
+	public void save(OutputStreamWriter out) {
+		try (PrintWriter writer = new PrintWriter(out)) {
 			write(writer);
 		}
 	}
