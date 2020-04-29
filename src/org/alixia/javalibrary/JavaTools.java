@@ -409,4 +409,25 @@ public final class JavaTools {
 		return frequencyMap(itr.iterator());
 	}
 
+	/**
+	 * Converts and adds each element in the <code>from</code> matrix to the
+	 * <code>test</code> collection.
+	 * 
+	 * @param <FE>      The type of element in the source object.
+	 * @param <TE>      The type of the element in the destination
+	 *                  {@link Collection}.
+	 * @param <T>       The type of the destination.
+	 * @param from      The source {@link Iterable}.
+	 * @param converter The converter, used to convert between <code>FE</code>s and
+	 *                  <code>TE</code>s.
+	 * @param dest      The destination {@link Collection}.
+	 * @return The destination {@link Collection}.
+	 */
+	public static <FE, TE, T extends Collection<? super TE>> T addAll(Iterable<? extends FE> from,
+			Function<FE, TE> converter, T dest) {
+		for (FE fe : from)
+			dest.add(converter.apply(fe));
+		return dest;
+	}
+
 }
