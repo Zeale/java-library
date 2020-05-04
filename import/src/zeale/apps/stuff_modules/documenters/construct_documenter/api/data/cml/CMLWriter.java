@@ -6,7 +6,15 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 public class CMLWriter {
-	private final boolean closeWithName = false;
+	private boolean closeWithName;
+
+	public void setCloseWithName(boolean closeWithName) {
+		this.closeWithName = closeWithName;
+	}
+
+	public boolean isCloseWithName() {
+		return closeWithName;
+	}
 
 	public void writeNode(final Node node, final OutputStream output, final Charset charset) {
 		final PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset));
