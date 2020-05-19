@@ -145,7 +145,7 @@ public class JSONParser {
 				throw new IllegalArgumentException("The key string in an object was not followed by a ':'.");
 			else
 				obj.put(str.getValue(), parseValue(stream.next(), stream));
-			while ((c = stream.next()) == ',') {
+			while ((c = parseWhitespace(stream)) == ',') {
 				c = parseWhitespace(stream);
 				if (c != '"')
 					throw new IllegalArgumentException("Malformed JSON.");
@@ -161,7 +161,7 @@ public class JSONParser {
 			if (c == '}')
 				return obj;
 			else
-				throw new IllegalArgumentException("Malformed JSON.");
+				throw new IllegalArgumentException("Malformed JSON." + (char) c);
 		}
 	}
 

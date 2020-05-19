@@ -16,6 +16,14 @@ public class JSONNumber extends Number implements JSONValue {
 		this.exp = exp;
 	}
 
+	public JSONNumber(long number) {
+		String left = String.valueOf(number);
+		if (neg = ((number & Long.MIN_VALUE) == Long.MIN_VALUE))
+			left = left.substring(1);
+		this.left = left;
+		right = exp = null;
+	}
+
 	@Override
 	public double doubleValue() {
 		StringBuilder b = new StringBuilder(left);

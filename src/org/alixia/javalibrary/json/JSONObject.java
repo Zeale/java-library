@@ -1,6 +1,7 @@
 package org.alixia.javalibrary.json;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class JSONObject extends HashMap<String, JSONValue> implements JSONValue {
 
@@ -21,9 +22,15 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 		if (isEmpty())
 			builder.append('\t');
 		else {
-			for (Entry<String, JSONValue> e : entrySet())
-				builder.append('\n').append(indentation).append('\t').append('"').append(e.getKey()).append('"')
+			Iterator<Entry<String, JSONValue>> iterator = entrySet().iterator();
+			Entry<String, JSONValue> e = iterator.next();
+			builder.append('\n').append(indentation).append('\t').append('"').append(JSONValue.escape(e.getKey())).append('"').append(':')
+					.append(e.getValue().toString(indentation + '\t'));
+			for (; iterator.hasNext();) {
+				e = iterator.next();
+				builder.append(",\n").append(indentation).append('\t').append('"').append(e.getKey()).append('"')
 						.append(':').append(e.getValue().toString(indentation + '\t'));
+			}
 			builder.append('\n');
 		}
 		builder.append(indentation).append('}');

@@ -19,14 +19,20 @@ public class JSONString implements JSONValue {
 
 	@Override
 	public String toString() {
-		return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"")
-				// .replace("/", "\\/")
-				.replace("\b", "\\b").replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t") + '"';
+		return '"' + JSONValue.escape(value) + '"';
 	}
 
+	/**
+	 * Adds the value of each {@link JSONString} in the {@link JSONString}
+	 * collection to the other collection.
+	 * 
+	 * @param <T>
+	 * @param c
+	 * @param t
+	 */
 	public static <T extends Collection<? super String>> void addAll(Collection<? extends JSONString> c, T t) {
 		for (JSONString j : c)
-			t.add(j.toString());
+			t.add(j.getValue());
 	}
 
 	@Override
