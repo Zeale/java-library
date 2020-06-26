@@ -18,6 +18,8 @@ import java.util.function.UnaryOperator;
 
 import org.alixia.javalibrary.util.Pair;
 
+import zeale.applicationss.notesss.utilities.Utilities;
+
 public final class JavaTools {
 	private JavaTools() {
 	}
@@ -428,6 +430,17 @@ public final class JavaTools {
 		for (FE fe : from)
 			dest.add(converter.apply(fe));
 		return dest;
+	}
+
+	@SafeVarargs
+	public static <T> T[] addToArray(T[] arr, T... items) {
+		if (arr == null)
+			return items;
+		if (items == null)
+			return arr;
+		T[] res = Utilities.array(arr.length + items.length, arr);
+		System.arraycopy(items, 0, res, arr.length, items.length);
+		return res;
 	}
 
 }
