@@ -1,7 +1,9 @@
 package org.alixia.javalibrary.util;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class MultidimensionalMap<V> {
 	private final int size;
@@ -10,6 +12,16 @@ public class MultidimensionalMap<V> {
 
 	public MultidimensionalMap(int size) {
 		this.size = size;
+	}
+
+	@SuppressWarnings({ "unchecked", "hiding" })
+	public <K, V> Iterator<Entry<K, V>> iterator() {
+		return (Iterator<Entry<K, V>>) (Iterator<?>) root.entrySet().iterator();
+	}
+
+	@SuppressWarnings("hiding")
+	public <K, V> Iterable<Entry<K, V>> iterable() {
+		return MultidimensionalMap.this::iterator;
 	}
 
 	private V read(Object... keys) {
