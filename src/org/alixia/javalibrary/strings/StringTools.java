@@ -1,5 +1,6 @@
 package org.alixia.javalibrary.strings;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,12 +24,10 @@ public final class StringTools {
 	 * before it can be checked.
 	 * </p>
 	 * 
-	 * @param string
-	 *            The string that may contain something in
-	 *            <code>possiblePieces</code>.
-	 * @param possiblePieces
-	 *            Any number of Strings. If <code>string</code> contains one of
-	 *            these, this method will return true.
+	 * @param string         The string that may contain something in
+	 *                       <code>possiblePieces</code>.
+	 * @param possiblePieces Any number of Strings. If <code>string</code> contains
+	 *                       one of these, this method will return true.
 	 * @return <code>true</code> if one of the <code>possiblePieces</code> are found
 	 *         inside <code>string</code>. False otherwise.
 	 */
@@ -91,6 +90,19 @@ public final class StringTools {
 			if (arg.equalsIgnoreCase(s))
 				return true;
 		return false;
+	}
+
+	private static final byte[] HEX_CHAR_BYTES = "0123456789ABCDEF".getBytes(StandardCharsets.UTF_8);
+
+	public static String toHexString(byte... b) {
+		byte[] rb = new byte[b.length * 2];
+
+		for (int i = 0; i < b.length; i++) {
+			rb[i * 2 + 1] = HEX_CHAR_BYTES[(b[i] >>> 4) & 0xF];
+			rb[i * 2] = HEX_CHAR_BYTES[b[i] & 0xF];
+		}
+
+		return new String(rb, StandardCharsets.UTF_8);
 	}
 
 }
