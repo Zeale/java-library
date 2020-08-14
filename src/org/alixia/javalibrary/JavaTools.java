@@ -24,6 +24,21 @@ public final class JavaTools {
 	private JavaTools() {
 	}
 
+	public static long bytesToLong(byte... bytes) {
+		return ((long) bytes[0] & 0xff) << 56 | ((long) bytes[1] & 0xff) << 48 | ((long) bytes[2] & 0xff) << 40
+				| ((long) bytes[3] & 0xff) << 32 | ((long) bytes[4] & 0xff) << 24 | ((long) bytes[5] & 0xff) << 16
+				| ((long) bytes[6] & 0xff) << 8 | ((long) bytes[7] & 0xff);
+	}
+
+	public static byte[] longToBytes(long l) {
+		return new byte[] { (byte) (l >>> 56), (byte) (l >>> 48), (byte) (l >>> 40), (byte) (l >>> 32),
+				(byte) (l >>> 24), (byte) (l >>> 16), (byte) (l >>> 8), (byte) l };
+	}
+
+	public static byte[] intToBytes(int i) {
+		return new byte[] { (byte) (i >>> 24), (byte) (i >>> 16), (byte) (i >>> 8), (byte) i };
+	}
+
 	@SafeVarargs
 	public static final <T> T pickRandomElement(T... ts) {
 		return ts[(int) (Math.random() * ts.length)];
