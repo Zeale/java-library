@@ -1,6 +1,7 @@
 package org.alixia.javalibrary.strings;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,11 +99,67 @@ public final class StringTools {
 		byte[] rb = new byte[b.length * 2];
 
 		for (int i = 0; i < b.length; i++) {
-			rb[i * 2 + 1] = HEX_CHAR_BYTES[(b[i] >>> 4) & 0xF];
-			rb[i * 2] = HEX_CHAR_BYTES[b[i] & 0xF];
+			rb[i * 2] = HEX_CHAR_BYTES[(b[i] >>> 4) & 0xF];
+			rb[i * 2 + 1] = HEX_CHAR_BYTES[b[i] & 0xF];
 		}
 
 		return new String(rb, StandardCharsets.UTF_8);
+	}
+
+	public static byte[] fromHexString(String b) {
+		if ((b.length() & 1) != 0)
+			throw new NumberFormatException("Input must be pairs of hex characters.");
+		byte[] rb = new byte[b.length() / 2];
+		for (int i = 0; i < b.length(); i += 2)
+			rb[i / 2] = (byte) (hexVal(b.charAt(i)) << 4 | hexVal(b.charAt(i + 1)));
+		return rb;
+	}
+
+	private static byte hexVal(char c) {
+		switch (c) {
+		case '0':
+			return 0;
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 4;
+		case '5':
+			return 5;
+		case '6':
+			return 6;
+		case '7':
+			return 7;
+		case '8':
+			return 8;
+		case '9':
+			return 9;
+		case 'A':
+			return 10;
+		case 'B':
+			return 11;
+		case 'C':
+			return 12;
+		case 'D':
+			return 13;
+		case 'E':
+			return 14;
+		case 'F':
+			return 15;
+		default:
+			throw new NumberFormatException("Input must be hex chars.");
+		}
+	}
+
+	public static String toBase64String(byte... data) {
+		return Base64.getEncoder().encodeToString(data);
+	}
+
+	public static byte[] fromBase64String(String base64) {
+		return Base64.getDecoder().decode(base64);
 	}
 
 }
