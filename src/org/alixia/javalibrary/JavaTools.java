@@ -27,7 +27,7 @@ public final class JavaTools {
 	public static long bytesToLong(byte... bytes) {
 		return ((long) bytes[0] & 0xff) << 56 | ((long) bytes[1] & 0xff) << 48 | ((long) bytes[2] & 0xff) << 40
 				| ((long) bytes[3] & 0xff) << 32 | ((long) bytes[4] & 0xff) << 24 | ((long) bytes[5] & 0xff) << 16
-				| ((long) bytes[6] & 0xff) << 8 | ((long) bytes[7] & 0xff);
+				| ((long) bytes[6] & 0xff) << 8 | (long) bytes[7] & 0xff;
 	}
 
 	public static byte[] longToBytes(long l) {
@@ -37,6 +37,11 @@ public final class JavaTools {
 
 	public static byte[] intToBytes(int i) {
 		return new byte[] { (byte) (i >>> 24), (byte) (i >>> 16), (byte) (i >>> 8), (byte) i };
+	}
+
+	public static int bytesToInt(byte... bytes) {
+		return ((int) bytes[0] & 0xff) << 24 | ((int) bytes[1] & 0xff) << 16 | ((int) bytes[2] & 0xff) << 8
+				| (int) bytes[3] & 0xff;
 	}
 
 	@SafeVarargs
