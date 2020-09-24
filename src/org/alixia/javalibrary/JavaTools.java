@@ -77,25 +77,23 @@ public final class JavaTools {
 		};
 	}
 
+	public static <E> Iterable<E> iterable(Iterator<E> itr) {
+		return () -> itr;
+	}
+
 	public static <E> Iterable<E> iterable(E[] arr) {
-		return new Iterable<E>() {
+		return () -> new Iterator<E>() {
+
+			int pos;
 
 			@Override
-			public Iterator<E> iterator() {
-				return new Iterator<E>() {
+			public boolean hasNext() {
+				return pos < arr.length;
+			}
 
-					int pos;
-
-					@Override
-					public boolean hasNext() {
-						return pos < arr.length;
-					}
-
-					@Override
-					public E next() {
-						return arr[pos++];
-					}
-				};
+			@Override
+			public E next() {
+				return arr[pos++];
 			}
 		};
 	}
