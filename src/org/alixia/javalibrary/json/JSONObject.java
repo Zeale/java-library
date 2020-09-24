@@ -2,8 +2,17 @@ package org.alixia.javalibrary.json;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class JSONObject extends HashMap<String, JSONValue> implements JSONValue {
+
+	public JSONObject(Map<? extends String, ? extends JSONValue> map) {
+		for (Entry<? extends String, ? extends JSONValue> e : map.entrySet())
+			put(e.getKey(), e.getValue());
+	}
+
+	public JSONObject() {
+	}
 
 	/**
 	 * SUID

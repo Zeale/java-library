@@ -3,7 +3,23 @@ package org.alixia.javalibrary.json;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.alixia.javalibrary.JavaTools;
+
 public class JSONArray extends ArrayList<JSONValue> implements JSONValue {
+
+	public JSONArray(JSONValue... values) {
+		for (JSONValue jv : values)
+			add(jv);
+	}
+
+	public JSONArray(Iterable<? extends JSONValue> values) {
+		for (JSONValue jv : values)
+			add(jv);
+	}
+
+	public JSONArray(Iterator<? extends JSONValue> values) {
+		this(JavaTools.iterable(values));
+	}
 
 	/**
 	 * SUID
