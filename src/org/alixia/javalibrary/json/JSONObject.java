@@ -55,6 +55,22 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 		return getJString(key).getValue();
 	}
 
+	public JSONConstant getJConstant(String key) {
+		return (JSONConstant) get(key);
+	}
+
+	public boolean getBoolean(String key) {
+		switch (getJConstant(key)) {
+		case FALSE:
+			return false;
+		case TRUE:
+			return true;
+		default:
+			throw new ClassCastException("The JSON Constant stored for the key, " + key
+					+ ", is not a boolean, but an attempt was made to access it as one.");
+		}
+	}
+
 	public JSONNumber getJNumber(String key) {
 		return (JSONNumber) get(key);
 	}
@@ -79,6 +95,11 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 
 	public JSONObject put(String key, long value) {
 		put(key, new JSONNumber(value));
+		return this;
+	}
+
+	public JSONObject put(String key, boolean value) {
+		put(key, value ? JSONConstant.TRUE : JSONConstant.FALSE);
 		return this;
 	}
 
