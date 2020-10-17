@@ -461,4 +461,17 @@ public final class JavaTools {
 		return res;
 	}
 
+	/**
+	 * Throws a {@link NullPointerException} if any of the objects provided are
+	 * <code>null</code>.
+	 * 
+	 * @param objects The array of objects.
+	 * @author Gartham
+	 */
+	public static void requireNonNull(Object... objects) {
+		for (Object o : objects)
+			if (o == null)
+				throw null;
+	}
+
 }
