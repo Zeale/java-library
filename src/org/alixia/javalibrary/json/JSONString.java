@@ -2,6 +2,8 @@ package org.alixia.javalibrary.json;
 
 import java.util.Collection;
 
+import org.alixia.javalibrary.JavaTools;
+
 public class JSONString implements JSONValue {
 	/**
 	 * SUID
@@ -9,7 +11,15 @@ public class JSONString implements JSONValue {
 	private static final long serialVersionUID = 1L;
 	private final String value;
 
+	/**
+	 * Constructs a {@link JSONString} that holds the provided {@link String}. The
+	 * provided {@link String} may not be <code>null</code>.
+	 * 
+	 * @param value The {@link String} that this {@link JSONString} should hold.
+	 * @author Gartham
+	 */
 	public JSONString(String value) {
+		JavaTools.requireNonNull(value);
 		this.value = value;
 	}
 
