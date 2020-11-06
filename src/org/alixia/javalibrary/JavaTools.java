@@ -452,13 +452,18 @@ public final class JavaTools {
 
 	@SafeVarargs
 	public static <T> T[] addToArray(T[] arr, T... items) {
-		if (arr == null)
-			return items;
-		if (items == null)
-			return arr;
+		requireNonNull(arr, items);
 		T[] res = Utilities.array(arr.length + items.length, arr);
 		System.arraycopy(items, 0, res, arr.length, items.length);
 		return res;
+	}
+
+	public static byte[] addToArray(byte[] arr, byte... items) {
+		requireNonNull(arr, items);
+		byte[] newArr = new byte[arr.length + items.length];
+		System.arraycopy(arr, 0, newArr, 0, arr.length);
+		System.arraycopy(items, 0, newArr, 0, items.length);
+		return newArr;
 	}
 
 	/**
