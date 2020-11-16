@@ -1,6 +1,7 @@
 package org.alixia.javalibrary;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -455,6 +456,18 @@ public final class JavaTools {
 		requireNonNull(arr, items);
 		T[] res = Utilities.array(arr.length + items.length, arr);
 		System.arraycopy(items, 0, res, arr.length, items.length);
+		return res;
+	}
+
+	@SafeVarargs
+	public static <T> T[] combine(T[]... arrays) {
+		int ts = 0;
+		for (int i = 0; i < arrays.length; i++)
+			ts += arrays[i].length;
+		@SuppressWarnings("unchecked")
+		T[] res = (T[]) Array.newInstance(arrays.getClass().getComponentType().getComponentType(), ts);
+		for (int i = 0, j = 0; i < arrays.length; j += arrays[i++].length)
+			System.arraycopy(arrays[i], 0, res, j, arrays[i].length);
 		return res;
 	}
 
