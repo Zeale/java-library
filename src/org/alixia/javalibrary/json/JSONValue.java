@@ -51,6 +51,7 @@ public interface JSONValue extends Serializable {
 	static String escape(String input) {
 		return input.replace("\\", "\\\\").replace("\"", "\\\"")
 				// .replace("/", "\\/")
-				.replace("\b", "\\b").replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t");
+				.replace("\b", "\\b").replace("\f", "\\f").replace("\r", "\\r").replace("\t", "\\t")
+				.replace("\n", "\\n");
 	}
 }
