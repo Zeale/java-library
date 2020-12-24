@@ -492,4 +492,31 @@ public final class JavaTools {
 				throw null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <F, T> T[] convert(Function<? super F, ? extends T> converter, F... fs) {
+		if (fs == null)
+			return null;
+		else if (fs.length == 0)
+			return (T[]) new Object[0];
+		else {
+			T first;
+			T[] res;
+			int i = 0;
+			LOOP: {
+				for (; i < fs.length; i++) {
+					first = converter.apply(fs[i]);
+					if (first != null) {
+						res = (T[]) Array.newInstance(first.getClass(), fs.length);
+						break LOOP;
+					}
+				}
+				return (T[]) new Object[fs.length];
+			}
+			res[i] = first;
+			for (; i < fs.length; i++)
+				res[i] = converter.apply(fs[i]);
+			return res;
+		}
+	}
+
 }
