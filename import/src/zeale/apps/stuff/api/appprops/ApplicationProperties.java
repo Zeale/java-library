@@ -17,10 +17,8 @@ public class ApplicationProperties extends ObservableKeyMap<Object, ObservableMa
 
 	public final static Key<String> THEME_STYLESHEET = key(), POP_BUTTON_STYLESHEET = key();
 
-	public final LocalKey<String> themeStylesheet = lk(THEME_STYLESHEET,
-			"zeale/apps/stuff/api/guis/windows/stylesheets/BasicStyles.css"),
-			popButtonStylesheet = lk(POP_BUTTON_STYLESHEET,
-					"zeale/apps/stuff/api/guis/windows/stylesheets/Pop%20Button.css");
+	public final LocalKey<String> themeStylesheet = lk(THEME_STYLESHEET),
+			popButtonStylesheet = lk(POP_BUTTON_STYLESHEET);
 
 	public ApplicationProperties() {
 		super(FXCollections.observableMap(new WeakHashMap<>()));

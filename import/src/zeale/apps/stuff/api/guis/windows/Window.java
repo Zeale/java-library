@@ -43,6 +43,13 @@ public abstract class Window {
 
 	public static final ApplicationProperties DEFAULT_APPLICATION_PROPERTIES = new ApplicationProperties();
 
+	static {
+		DEFAULT_APPLICATION_PROPERTIES.themeStylesheet
+				.put("zeale/apps/stuff/api/guis/windows/stylesheets/BasicStyles.css");
+		DEFAULT_APPLICATION_PROPERTIES.popButtonStylesheet
+				.put("zeale/apps/stuff/api/guis/windows/stylesheets/Pop%20Button.css");
+	}
+
 	private static final Object STAGE_WINDOW_KEY = new Object();
 
 	public static boolean clean(Stage stage) {
