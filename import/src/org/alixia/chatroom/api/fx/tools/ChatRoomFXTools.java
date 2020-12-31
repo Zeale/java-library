@@ -14,7 +14,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -159,7 +158,7 @@ public final class ChatRoomFXTools {
 	 * @param y     The starting y position of the text.
 	 */
 	public static void spawnLabel(final String text, final Color color, final double x, final double y,
-			final Stage stage) {
+			final Window stage) {
 		final Popup pc = new Popup();
 		final Label label = new Label(text);
 		label.setMouseTransparent(true);
@@ -193,7 +192,7 @@ public final class ChatRoomFXTools {
 		opacityTransition.play();
 	}
 
-	public static void spawnLabelAtMousePos(final String text, final Color color, final Stage stage) {
+	public static void spawnLabelAtMousePos(final String text, final Color color, final Window stage) {
 		spawnLabel(text, color, MouseInfo.getPointerInfo().getLocation().getX(),
 				MouseInfo.getPointerInfo().getLocation().getY(), stage);
 	}
