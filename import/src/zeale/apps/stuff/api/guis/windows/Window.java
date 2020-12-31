@@ -41,12 +41,23 @@ public abstract class Window {
 
 	}
 
-	public static final ApplicationProperties DEFAULT_APPLICATION_PROPERTIES = new ApplicationProperties();
+	public static final ApplicationProperties INITIAL_DEFAULT_APPLICATION_PROPERTIES = new ApplicationProperties();
+	private static ApplicationProperties defaultApplicationProperties = INITIAL_DEFAULT_APPLICATION_PROPERTIES;
+
+	public static void setDefaultApplicationProperties(ApplicationProperties defaultApplicationProperties) {
+		Window.defaultApplicationProperties = defaultApplicationProperties == null
+				? INITIAL_DEFAULT_APPLICATION_PROPERTIES
+				: defaultApplicationProperties;
+	}
+
+	public static ApplicationProperties getDefaultApplicationProperties() {
+		return defaultApplicationProperties;
+	}
 
 	static {
-		DEFAULT_APPLICATION_PROPERTIES.themeStylesheet
+		INITIAL_DEFAULT_APPLICATION_PROPERTIES.themeStylesheet
 				.put("zeale/apps/stuff/api/guis/windows/stylesheets/BasicStyles.css");
-		DEFAULT_APPLICATION_PROPERTIES.popButtonStylesheet
+		INITIAL_DEFAULT_APPLICATION_PROPERTIES.popButtonStylesheet
 				.put("zeale/apps/stuff/api/guis/windows/stylesheets/Pop%20Button.css");
 	}
 
@@ -106,7 +117,7 @@ public abstract class Window {
 	 *                                    on the given {@link Stage}.
 	 */
 	public final void display(Stage stage) throws WindowLoadFailureException {
-		display(stage, DEFAULT_APPLICATION_PROPERTIES);
+		display(stage, getDefaultApplicationProperties());
 	}
 
 	public final synchronized void display(Stage stage, ApplicationProperties properties)
