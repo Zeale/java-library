@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.Stack;
 import java.util.function.Function;
@@ -517,6 +518,47 @@ public final class JavaTools {
 				res[i] = converter.apply(fs[i]);
 			return res;
 		}
+	}
+
+	@SafeVarargs
+	public static <T> Iterable<T> iterable(Iterable<? extends T>... iterables) {
+		return () -> iterator(iterables);
+	}
+
+	public static <T> Iterator<T> iterator(Iterable<? extends T>... iterables) {
+		@SuppressWarnings("unchecked")
+		Iterator<? extends T>[] itrs = new Iterator[iterables.length];
+		for (int i = 0; i < iterables.length; i++)
+			itrs[i] = iterables[i].iterator();
+		return concat(itrs);
+	}
+
+	public static <T> Iterator<T> concat(Iterator<? extends T>... iterators) {
+		return new Iterator<T>() {
+			int i = 0;
+
+			@Override
+			public void remove() {
+				if (i < iterators.length)
+					iterators[i].remove();
+			}
+
+			@Override
+			public boolean hasNext() {
+				for (; i < iterators.length; i++)
+					if (iterators[i].hasNext())
+						return true;
+				return false;
+			}
+
+			@Override
+			public T next() {
+				if (!hasNext())
+					throw new NoSuchElementException();
+				else
+					return iterators[i].next();
+			}
+		};
 	}
 
 }
