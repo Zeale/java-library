@@ -88,6 +88,14 @@ public abstract class Window {
 	}
 
 	private boolean called;
+	
+	public final boolean displayed() {
+		return called;
+	}
+
+	public final boolean showing(Stage stage) {
+		return stage.getProperties().get(STAGE_WINDOW_KEY) == this;
+	}
 
 	/**
 	 * Cleans up this window. This method should refrain from calling any methods on
