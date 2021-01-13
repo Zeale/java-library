@@ -450,8 +450,42 @@ public final class BindingTools {
 	 */
 	@SafeVarargs
 	public static <T> FilterBinding<T> filterBind(ObservableList<? extends T> container, List<T> boundContainer,
-			Function<T, Boolean>... filters) {
+			Function<? super T, Boolean>... filters) {
 		return new FilterBinding<>(container, boundContainer, filters);
+	}
+
+	/**
+	 * This function is effectively equivalent to
+	 * {@link #filterBind(ObservableList, List, Function...)} with the exception
+	 * that filters which can be passed into this function but not into
+	 * {@link #filterBind(ObservableList, List, Function...)} can cause exceptional
+	 * behavior when the <code>boundContainer</code> is being <i>strained</i>. The
+	 * bound container may sometimes need to have elements—that were added to it by
+	 * means other than this filtered binding—removed. In these cases, the removed
+	 * elements will be passed through the provided filters to assure that the
+	 * removal change should be propagated to the <code>boundContainer</code>, but
+	 * if any of these elements does not fit in one of the specified filters, a
+	 * {@link ClassCastException} will be thrown.
+	 * 
+	 * @param <T1>           The type of value of the observed list.
+	 * @param <T2>           The type of value of the bound list.
+	 * @param container      The container to observe.
+	 * @param boundContainer The container that changes will be propagated to.
+	 * @param filters        The filters that must be able to accept items which are
+	 *                       a supertype of <i>only the observed list</i>
+	 *                       (<code>container</code>). It is expected that the
+	 *                       <code>boundContainer</code> is not modified except
+	 *                       through the active filter when this filter is active
+	 *                       and that the list is empty to begin with to assure that
+	 *                       all of these filters are only ever provided a subset of
+	 *                       the values contained in the observed list.
+	 * @return A {@link FilterBinding} representing the binding.
+	 */
+	@SafeVarargs
+	@SuppressWarnings("unchecked")
+	public static <T1, T2 extends T1> FilterBinding<T1> filterBind1(ObservableList<T2> container,
+			List<T1> boundContainer, Function<? super T2, Boolean>... filters) {
+		return filterBind(container, boundContainer, (Function<? super T1, Boolean>[]) filters);
 	}
 
 	public static final class FilterBinding<T> {
