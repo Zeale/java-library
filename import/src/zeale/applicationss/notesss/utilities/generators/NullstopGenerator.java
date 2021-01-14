@@ -1,5 +1,7 @@
 package zeale.applicationss.notesss.utilities.generators;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -37,5 +39,15 @@ public abstract class NullstopGenerator<R> implements Generator<R>, Iterator<R> 
 	}
 
 	protected abstract R nextItem();
+
+	@Override
+	public void collect(int count, Collection<? super R> collection) {
+		for (; count > 0; count--) {
+			R next = next();
+			if (next == null)
+				return;
+			collection.add(next);
+		}
+	}
 
 }
