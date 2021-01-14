@@ -1,5 +1,9 @@
 package zeale.applicationss.notesss.utilities.generators;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public interface Generator<R> {
 	@SafeVarargs
 	static <R, T extends R> Generator<R> arrayLoop(T... array) {
@@ -22,5 +26,16 @@ public interface Generator<R> {
 	}
 
 	R next();
+
+	default void collect(int count, Collection<? super R> collection) {
+		for (; count > 0; count--)
+			collection.add(next());
+	}
+
+	default ArrayList<R> collect(int count) {
+		ArrayList<R> list = new ArrayList<>(count);
+		collect(count, list);
+		return list;
+	}
 
 }
