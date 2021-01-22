@@ -98,6 +98,12 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 		return this;
 	}
 
+	public JSONObject putIfNonNull(String key, String value) {
+		if (value != null)
+			put(key, value);
+		return this;
+	}
+
 	public JSONObject put(String key, boolean value) {
 		put(key, value ? JSONConstant.TRUE : JSONConstant.FALSE);
 		return this;
