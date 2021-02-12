@@ -109,4 +109,12 @@ public class JSONObject extends HashMap<String, JSONValue> implements JSONValue 
 		return this;
 	}
 
+	/**
+	 * Returns a shallow copy of this {@link JSONObject}.
+	 */
+	@Override
+	public JSONObject clone() {
+		return new JSONObject(this);
+	}
+
 }
