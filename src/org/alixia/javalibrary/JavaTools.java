@@ -453,6 +453,11 @@ public final class JavaTools {
 	}
 
 	@SafeVarargs
+	public static <T> T[] array(T... items) {
+		return items;
+	}
+	
+	@SafeVarargs
 	public static <T> T[] addToArray(T[] arr, T... items) {
 		requireNonNull(arr, items);
 		T[] res = Utilities.array(arr.length + items.length, arr);
