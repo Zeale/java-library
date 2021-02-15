@@ -1,5 +1,7 @@
 package org.alixia.javalibrary.strings.matching;
 
+import java.util.function.Function;
+
 import org.alixia.javalibrary.streams.CharacterStream;
 
 /**
@@ -121,21 +123,32 @@ public interface Matching {
 	}
 
 	static Matching whitespace() {
-		return text -> {
-			if (text.isEmpty() || !Character.isWhitespace(text.charAt(0)))
-				return text;
+		return filter(Character::isWhitespace);
+	}
 
-			CharacterStream strm = CharacterStream.from(text);
-			for (int c = strm.next(); c != -1; c = strm.next())
-				if (!Character.isWhitespace(c)) {
-					StringBuilder buff = new StringBuilder();
-					buff.append((char) c);
-					while ((c = strm.next()) != -1)
-						buff.append((char) c);
-					return buff.toString();
-				}
+	/**
+	 * Returns <code>true</code> if the character matches this matching,
+	 * <code>false</code> otherwise.
+	 * 
+	 * @param filter The filter to use to check if each {@link Character} in the
+	 *               string to be matched matches.
+	 * @return The new {@link Matching}.
+	 */
+	static Matching filter(Function<Character, Boolean> filter) {
+		return text -> {
+			for (int i = 0; i < text.length(); i++)
+				if (!filter.apply(text.charAt(i)))
+					return text.substring(i);
 			return "";
 		};
+	}
+
+	static Matching numbers() {
+		return filter(Character::isDigit);
+	}
+
+	static Matching letters() {
+		return filter(Character::isLetter);
 	}
 
 	static Matching identifier() {
