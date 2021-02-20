@@ -29,6 +29,27 @@ public class MultidimensionalMap<V> {
 		return map == null ? null : map.get(keys[keys.length - 1]);
 	}
 
+	/**
+	 * Returns the map at the specified level, if there is one. This can be used to
+	 * get a layer of this {@link MultidimensionalMap}. This method accepts any
+	 * number of {@link Object} keys up to <code>{@link #size} - 1</code>.
+	 * 
+	 * @param keys The keys for the layer.
+	 * @return The layer, as a {@link Map}.
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<?, ?> readDim(Object... keys) {
+		if (keys == null || keys.length > size)
+			throw new IllegalArgumentException("Illegal map access.");
+		Object curr = root;
+		for (int i = 0; i < keys.length; i++)
+			if (((Map<?, V>) curr).containsKey(keys[i]))
+				curr = ((Map<?, Map<?, ?>>) curr).get(keys[i]);
+			else
+				return null;
+		return (Map<?, ?>) curr;
+	}
+
 	@SuppressWarnings("unchecked")
 	private Map<?, V> readMap(Object... keys) {
 		if (keys == null || keys.length > size)
