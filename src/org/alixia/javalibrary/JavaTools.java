@@ -456,7 +456,7 @@ public final class JavaTools {
 	public static <T> T[] array(T... items) {
 		return items;
 	}
-	
+
 	@SafeVarargs
 	public static <T> T[] addToArray(T[] arr, T... items) {
 		requireNonNull(arr, items);
@@ -564,6 +564,29 @@ public final class JavaTools {
 					return iterators[i].next();
 			}
 		};
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> int binarySearch(T object, List<? extends T> list, Comparator<? super T> comparator) {
+		if (comparator == null)
+			comparator = (Comparator<Object>) Comparator.naturalOrder();
+		if (list.isEmpty())
+			return -1;
+		int min = 0, max = list.size() - 1;
+		int index = (max - min) / 2 + ((max - min) & 1) + min;
+		while (true) {
+			index = (max - min) / 2 + ((max - min) & 1) + min;
+			int res = comparator.compare(object, list.get(index));
+			if (res == 0)
+				return index;
+			else if (res > 0) {
+				// Our object is higher, move min up:
+				if (max < (min = index + 1))
+					return -index - 2;
+			} else // Our object is lower, move max down:
+			if ((max = index - 1) < min)
+				return -index - 1;
+		}
 	}
 
 }
