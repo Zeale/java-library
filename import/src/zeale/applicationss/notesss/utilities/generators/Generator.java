@@ -2,7 +2,7 @@ package zeale.applicationss.notesss.utilities.generators;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
 
 public interface Generator<R> {
 	@SafeVarargs
@@ -16,6 +16,20 @@ public interface Generator<R> {
 			@Override
 			public T next() {
 				return array[++pos >= array.length ? (pos = 0) : pos];
+			}
+		};
+	}
+
+	static <R, T extends R> Generator<R> loop(Iterable<T> itr) {
+		return new Generator<R>() {
+
+			private Iterator<T> i = itr.iterator();
+
+			@Override
+			public R next() {
+				if (!i.hasNext())
+					i = itr.iterator();
+				return i.next();
 			}
 		};
 	}
