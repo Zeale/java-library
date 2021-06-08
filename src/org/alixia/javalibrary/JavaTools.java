@@ -588,5 +588,27 @@ public final class JavaTools {
 				return -index - 1;
 		}
 	}
+	
+	public static String printInEnglish(Iterator<?> itr, boolean and) {
+		final StringBuilder builder = new StringBuilder();
+		if (itr.hasNext()) {
+			builder.append(itr.next());
+			if (itr.hasNext()) {
+				Object o = itr.next();
+				if (!itr.hasNext())
+					builder.append(' ' + (and ? "and" : "or") + ' ').append(o);
+				else {
+					Object two = itr.next();
+					while (itr.hasNext()) {
+						builder.append(", ").append(o);
+						o = two;
+						two = itr.next();
+					}
+					builder.append(", ").append(o).append(", " + (and ? "and" : "or") + ' ').append(two);
+				}
+			}
+		}
+		return builder.toString();
+	}
 
 }
