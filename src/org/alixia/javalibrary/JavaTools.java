@@ -416,7 +416,14 @@ public final class JavaTools {
 	}
 
 	public static <E> Map<E, Integer> frequencyMap(Iterator<? extends E> itr) {
-		Map<E, Integer> freqmap = new HashMap<>();
+		return frequencyMap(itr, new HashMap<>());
+	}
+
+	public static <E> Map<E, Integer> frequencyMap(Iterable<? extends E> itr) {
+		return frequencyMap(itr.iterator(), new HashMap<>());
+	}
+
+	public static <E, M extends Map<? super E, Integer>> M frequencyMap(Iterator<? extends E> itr, M freqmap) {
 		for (; itr.hasNext();) {
 			E val = itr.next();
 			if (freqmap.containsKey(val))
@@ -427,8 +434,8 @@ public final class JavaTools {
 		return freqmap;
 	}
 
-	public static <E> Map<E, Integer> frequencyMap(Iterable<? extends E> itr) {
-		return frequencyMap(itr.iterator());
+	public static <E, M extends Map<? super E, Integer>> M frequencyMap(Iterable<? extends E> itr, M freqmap) {
+		return frequencyMap(itr.iterator(), freqmap);
 	}
 
 	/**
@@ -588,7 +595,7 @@ public final class JavaTools {
 				return -index - 1;
 		}
 	}
-	
+
 	public static String printInEnglish(Iterator<?> itr, boolean and) {
 		final StringBuilder builder = new StringBuilder();
 		if (itr.hasNext()) {
