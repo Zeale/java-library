@@ -537,6 +537,7 @@ public final class JavaTools {
 		return () -> iterator(iterables);
 	}
 
+	@SafeVarargs
 	public static <T> Iterator<T> iterator(Iterable<? extends T>... iterables) {
 		@SuppressWarnings("unchecked")
 		Iterator<? extends T>[] itrs = new Iterator[iterables.length];
@@ -545,6 +546,7 @@ public final class JavaTools {
 		return concat(itrs);
 	}
 
+	@SafeVarargs
 	public static <T> Iterator<T> concat(Iterator<? extends T>... iterators) {
 		return new Iterator<T>() {
 			int i = 0;
@@ -616,6 +618,25 @@ public final class JavaTools {
 			}
 		}
 		return builder.toString();
+	}
+
+	public static <E> List<E> paginate(int page, int itemsPerPage, List<E> items) {
+		if (items.size() == 0 && page == 1)
+			return items.subList(0, 0);
+		int item = (page - 1) * itemsPerPage;
+		int maxPage = maxPage(itemsPerPage, items);
+		if (page < 1 || page > maxPage)
+			return null;
+
+		return items.subList(item, Math.min(item + itemsPerPage, items.size()));
+	}
+
+	public static int maxPage(int itemsPerPage, List<?> items) {
+		return maxPage(itemsPerPage, items.size());
+	}
+
+	public static int maxPage(int itemsPerPage, int listSize) {
+		return (listSize + itemsPerPage - 1) / itemsPerPage;
 	}
 
 }
